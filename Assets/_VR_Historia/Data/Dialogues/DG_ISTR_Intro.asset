@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700010d55a8039c33999c20259dd9fc4, type: 3}
+  m_Name: DG_ISTR_Intro
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueGraph
+  dialogueID: DG_ISTR_Intro
+  startNodeID: DG_ISTR_Intro_node_0
+  nodes:
+  - nodeID: DG_ISTR_Intro_node_0
+    speakerID: sistema
+    speakerName: Sistema
+    text: Bienvenido al turno nocturno del edificio ISTR.
+    audioClip: {fileID: 0}
+    emotion: 0
+    choices: []
+    nextNodeID: istr_02
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: istr_02
+    speakerID: sistema
+    speakerName: Sistema
+    text: 'Su tarea: monitorear los servidores. Todo parece normal... por ahora.'
+    audioClip: {fileID: 0}
+    emotion: 0
+    choices: []
+    nextNodeID: 
+    flagToSet: 
+    autoAdvanceDelay: 4

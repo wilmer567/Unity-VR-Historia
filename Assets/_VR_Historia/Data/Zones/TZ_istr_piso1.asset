@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 879090c37eaced203957425cc0142568, type: 3}
+  m_Name: TZ_istr_piso1
+  m_EditorClassIdentifier: Assembly-CSharp::TeleportZone
+  zoneID: istr_piso1
+  displayName: ISTR Piso 1
+  isUnlocked: 1
+  requiredFlag: 
+  sceneIndex: -1
+  sceneName: SimulacionISTR
+  arrivalPosition: {x: 0, y: 0, z: 0}
+  arrivalYRotation: 0
+  transitionEffect: 0
+  transitionDuration: 1
+  description: 

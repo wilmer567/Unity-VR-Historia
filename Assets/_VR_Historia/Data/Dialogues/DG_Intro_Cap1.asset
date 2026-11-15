@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700010d55a8039c33999c20259dd9fc4, type: 3}
+  m_Name: DG_Intro_Cap1
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueGraph
+  dialogueID: DG_Intro_Cap1
+  startNodeID: DG_Intro_Cap1_node_0
+  nodes:
+  - nodeID: DG_Intro_Cap1_node_0
+    speakerID: narrador
+    speakerName: Narrador
+    text: Despiertas en una habitacion que no reconoces.
+    audioClip: {fileID: 0}
+    emotion: 0
+    choices: []
+    nextNodeID: intro_02
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: intro_02
+    speakerID: narrador
+    speakerName: Narrador
+    text: El aire huele a humedad y metal oxidado.
+    audioClip: {fileID: 0}
+    emotion: 3
+    choices: []
+    nextNodeID: intro_03
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: intro_03
+    speakerID: narrador
+    speakerName: Narrador
+    text: Un diario sobre la mesa parece llamarte.
+    audioClip: {fileID: 0}
+    emotion: 4
+    choices: []
+    nextNodeID: 
+    flagToSet: 
+    autoAdvanceDelay: 4

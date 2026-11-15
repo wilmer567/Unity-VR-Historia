@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700010d55a8039c33999c20259dd9fc4, type: 3}
+  m_Name: DG_Entidad
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueGraph
+  dialogueID: DG_Entidad
+  startNodeID: DG_Entidad_node_0
+  nodes:
+  - nodeID: DG_Entidad_node_0
+    speakerID: ???
+    speakerName: ???
+    text: Te hemos observado desde el inicio.
+    audioClip: {fileID: 0}
+    emotion: 5
+    choices: []
+    nextNodeID: ent_02
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: ent_02
+    speakerID: ???
+    speakerName: ???
+    text: Cada paso que diste... fue calculado.
+    audioClip: {fileID: 0}
+    emotion: 2
+    choices: []
+    nextNodeID: ent_03
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: ent_03
+    speakerID: ???
+    speakerName: ???
+    text: Ahora debes elegir. No hay vuelta atras.
+    audioClip: {fileID: 0}
+    emotion: 4
+    choices: []
+    nextNodeID: 
+    flagToSet: 
+    autoAdvanceDelay: 4

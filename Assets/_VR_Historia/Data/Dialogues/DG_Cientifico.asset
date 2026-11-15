@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700010d55a8039c33999c20259dd9fc4, type: 3}
+  m_Name: DG_Cientifico
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueGraph
+  dialogueID: DG_Cientifico
+  startNodeID: DG_Cientifico_node_0
+  nodes:
+  - nodeID: DG_Cientifico_node_0
+    speakerID: dr_mendez
+    speakerName: Dr. Mendez
+    text: Ah, un visitante. Hace tiempo que nadie viene por aqui.
+    audioClip: {fileID: 0}
+    emotion: 1
+    choices: []
+    nextNodeID: cient_02
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: cient_02
+    speakerID: dr_mendez
+    speakerName: Dr. Mendez
+    text: Los experimentos... se salieron de control.
+    audioClip: {fileID: 0}
+    emotion: 3
+    choices: []
+    nextNodeID: cient_03
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: cient_03
+    speakerID: dr_mendez
+    speakerName: Dr. Mendez
+    text: Si quieres respuestas, busca en los archivos del sotano.
+    audioClip: {fileID: 0}
+    emotion: 0
+    choices: []
+    nextNodeID: 
+    flagToSet: 
+    autoAdvanceDelay: 4

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700010d55a8039c33999c20259dd9fc4, type: 3}
+  m_Name: DG_Guardia
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueGraph
+  dialogueID: DG_Guardia
+  startNodeID: DG_Guardia_node_0
+  nodes:
+  - nodeID: DG_Guardia_node_0
+    speakerID: guardia
+    speakerName: Guardia
+    text: Alto. No deberias estar aqui.
+    audioClip: {fileID: 0}
+    emotion: 2
+    choices: []
+    nextNodeID: guardia_02
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: guardia_02
+    speakerID: guardia
+    speakerName: Guardia
+    text: Hmm... o quizas si. Las cosas no son lo que parecen.
+    audioClip: {fileID: 0}
+    emotion: 0
+    choices: []
+    nextNodeID: guardia_03
+    flagToSet: 
+    autoAdvanceDelay: 4
+  - nodeID: guardia_03
+    speakerID: guardia
+    speakerName: Guardia
+    text: Toma esta llave. La vas a necesitar.
+    audioClip: {fileID: 0}
+    emotion: 0
+    choices: []
+    nextNodeID: 
+    flagToSet: 
+    autoAdvanceDelay: 4

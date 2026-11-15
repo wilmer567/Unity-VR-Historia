@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/MenuPrincipalVR.unity
+    guid: f2994a7c34afbd6928f92e74852424ac
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/HistoriaCapitulo1_Despertar.unity
+    guid: 0e4881100931b4cf8ab3c9ba999f043a
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/HistoriaCapitulo2_Exploracion.unity
+    guid: acfa7ab03506a302b801d99f1531b510
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/HistoriaCapitulo3_Revelacion.unity
+    guid: 4b5f6b508375014e98679aa0e90da3d7
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/SimulacionISTR.unity
+    guid: 9ff164600814115bd877332978e47e6e
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: bd6936fa92496ee5abb3716802d5ba7b, type: 2}
