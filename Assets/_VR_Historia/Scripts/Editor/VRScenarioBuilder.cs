@@ -11,8 +11,8 @@ using TMPro;
 public class VRScenarioBuilder : EditorWindow
 {
     private const string SCENES_PATH = "Assets/_Unity Essentials/Scenes/";
-    private const string SO_PATH = "Assets/Scripts/Historia/Data/";
-    private const string PREFAB_PATH = "Assets/Scripts/Historia/Prefabs/";
+    private const string SO_PATH = "Assets/_VR_Historia/Data/";
+    private const string PREFAB_PATH = "Assets/_VR_Historia/Prefabs/";
 
     [MenuItem("VR Historia/Construir TODOS los Escenarios", priority = 1)]
     public static void ConstruirTodo()
