@@ -11,6 +11,7 @@ public class EdificioSyntro : EditorWindow
     static Material matPuertaMadera, matPuertaMetal, matMarcoPuerta, matVentanilla;
     static Material matZocalo, matMoldura, matNumero, matPisoSuperior;
     static Material matVidrio, matBarandal, matLuzPasillo;
+    static Material matPisoSotano, matParedSotano, matEscalon;
 
     [MenuItem("Syntro Terror/Construir Edificio Syntro Completo")]
     public static void Ejecutar()
@@ -27,15 +28,18 @@ public class EdificioSyntro : EditorWindow
         edificio.transform.position = Vector3.zero;
         Undo.RegisterCreatedObjectUndo(edificio, "Crear Edificio Syntro");
 
+        ConstruirSotano(edificio.transform);
         ConstruirPiso1(edificio.transform);
+        ConstruirPiso2(edificio.transform);
         ConstruirPiso3(edificio.transform);
+        ConstruirGradas(edificio.transform);
         ConstruirExteriorEdificio(edificio.transform);
 
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
             UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
 
-        Debug.Log("[Edificio] === COMPLETADO: Edificio Syntro con pasillos y puertas decorativas ===");
+        Debug.Log("[Edificio] === COMPLETADO: Edificio con Sotano + P1 + P2 + P3 + Gradas ===");
     }
 
     static void AsegurarCarpetas()
@@ -87,7 +91,14 @@ public class EdificioSyntro : EditorWindow
         matLuzPasillo = CrearMatEmisivo("Mat_LuzPasillo_Syntro", lit,
             new Color(0.9f, 0.85f, 0.7f), new Color(0.8f, 0.7f, 0.45f) * 1.5f);
 
-        Debug.Log("[Edificio] 15 materiales de edificio creados");
+        matPisoSotano = CrearMat("Mat_PisoSotano_Syntro", lit,
+            new Color(0.1f, 0.1f, 0.11f), 0f, 0.2f);
+        matParedSotano = CrearMat("Mat_ParedSotano_Syntro", lit,
+            new Color(0.14f, 0.13f, 0.12f), 0f, 0.12f);
+        matEscalon = CrearMat("Mat_Escalon_Syntro", lit,
+            new Color(0.25f, 0.23f, 0.2f), 0.15f, 0.4f);
+
+        Debug.Log("[Edificio] 18 materiales de edificio creados");
     }
 
     static Material CrearMat(string nombre, Shader shader, Color color, float met, float smooth)
@@ -560,6 +571,303 @@ public class EdificioSyntro : EditorWindow
     }
 
     // =====================================================
+    //  SOTANO (Y=-4, debajo del Piso 1)
+    // =====================================================
+
+    static void ConstruirSotano(Transform edificio)
+    {
+        GameObject sotano = Contenedor("Sotano_Edificio", edificio, new Vector3(0f, -4f, 0f));
+        float alto = 3.5f;
+
+        // Piso
+        Cubo("Piso_Sotano", sotano.transform,
+            new Vector3(0f, -0.05f, 0f), new Vector3(18f, 0.1f, 14f), matPisoSotano);
+        // Techo
+        Cubo("Techo_Sotano", sotano.transform,
+            new Vector3(0f, alto, 0f), new Vector3(18f, 0.15f, 14f), matPisoSotano);
+
+        // Paredes
+        Cubo("Pared_N_Sot", sotano.transform,
+            new Vector3(0f, alto / 2f, 7f), new Vector3(18f, alto, 0.2f), matParedSotano);
+        Cubo("Pared_S_Sot", sotano.transform,
+            new Vector3(0f, alto / 2f, -7f), new Vector3(18f, alto, 0.2f), matParedSotano);
+        Cubo("Pared_E_Sot", sotano.transform,
+            new Vector3(9f, alto / 2f, 0f), new Vector3(0.2f, alto, 14f), matParedSotano);
+        Cubo("Pared_O_Sot", sotano.transform,
+            new Vector3(-9f, alto / 2f, 0f), new Vector3(0.2f, alto, 14f), matParedSotano);
+
+        // Pasillo central
+        Cubo("Div_L_Sot", sotano.transform,
+            new Vector3(-3f, alto / 2f, -2f), new Vector3(0.15f, alto, 8f), matParedSotano);
+        Cubo("Div_R_Sot", sotano.transform,
+            new Vector3(3f, alto / 2f, -2f), new Vector3(0.15f, alto, 8f), matParedSotano);
+
+        // Puerta generadores
+        Cubo("Puerta_Gen", sotano.transform,
+            new Vector3(0f, 1.1f, -4f), new Vector3(1.2f, 2.2f, 0.08f), matPuertaMetal);
+
+        // Tuberias techo
+        for (int i = 0; i < 5; i++)
+        {
+            float x = -6f + i * 3f;
+            GameObject tub = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            tub.name = $"Tuberia_Sot_{i}";
+            tub.transform.SetParent(sotano.transform);
+            tub.transform.localPosition = new Vector3(x, alto - 0.15f, 0f);
+            tub.transform.localScale = new Vector3(0.1f, 7f, 0.1f);
+            tub.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            tub.GetComponent<Renderer>().sharedMaterial = matBarandal;
+            Object.DestroyImmediate(tub.GetComponent<Collider>());
+            Undo.RegisterCreatedObjectUndo(tub, "Tuberia");
+        }
+
+        // Luces tenues
+        for (int i = 0; i < 3; i++)
+        {
+            GameObject lz = new GameObject($"Luz_Sotano_{i}");
+            lz.transform.SetParent(sotano.transform);
+            lz.transform.localPosition = new Vector3(-4f + i * 4f, alto - 0.3f, 0f);
+            Light l = lz.AddComponent<Light>();
+            l.type = LightType.Point; l.range = 6f; l.intensity = 0.4f;
+            l.color = new Color(0.7f, 0.5f, 0.25f);
+            Undo.RegisterCreatedObjectUndo(lz, "Luz sotano");
+        }
+
+        // Apertura en techo para gradas (hueco)
+        // Se deja un vacio en X=7..9 Z=-3..-1 del techo del sotano
+        // (el techo ya fue creado solido, ahora cortamos creando paredes alrededor del hueco)
+        // En realidad el hueco se logra no poniendo techo ahi — recreamos el techo en secciones
+        Object.DestroyImmediate(sotano.transform.Find("Techo_Sotano")?.gameObject);
+        Cubo("Techo_Sot_L", sotano.transform,
+            new Vector3(-1f, alto, 0f), new Vector3(16f, 0.15f, 14f), matPisoSotano);
+        Cubo("Techo_Sot_R", sotano.transform,
+            new Vector3(8f, alto, 3f), new Vector3(2f, 0.15f, 8f), matPisoSotano);
+
+        Debug.Log("[Edificio] Sotano construido: 18x14m con pasillo central y tuberias");
+    }
+
+    // =====================================================
+    //  PISO 2 (Y=4, entre Piso 1 y Piso 3)
+    // =====================================================
+
+    static void ConstruirPiso2(Transform edificio)
+    {
+        float yBase = 4f;
+        float alto = 3.5f;
+        float anchoPas = 2.4f;
+        float largoPas = 18f;
+
+        GameObject piso2 = Contenedor("Piso2_Edificio", edificio, new Vector3(0f, yBase, 6f));
+        GameObject pasillo = Contenedor("Pasillo_P2", piso2.transform, Vector3.zero);
+
+        // Piso y techo
+        Cubo("Piso_P2", pasillo.transform,
+            new Vector3(0f, -0.05f, 0f), new Vector3(largoPas, 0.1f, anchoPas), matPiso);
+        Cubo("Techo_P2", pasillo.transform,
+            new Vector3(0f, alto + 0.05f, 0f), new Vector3(largoPas, 0.1f, anchoPas), matTecho);
+
+        // Paredes norte y sur
+        Cubo("Pared_N_P2", pasillo.transform,
+            new Vector3(0f, alto / 2f, anchoPas / 2f), new Vector3(largoPas, alto, 0.15f), matParedInterior);
+        Cubo("Pared_S_P2", pasillo.transform,
+            new Vector3(0f, alto / 2f, -anchoPas / 2f), new Vector3(largoPas, alto, 0.15f), matParedInterior);
+
+        // Cierres laterales (con hueco en el lado este para gradas)
+        Cubo("Cierre_O_P2", pasillo.transform,
+            new Vector3(-largoPas / 2f, alto / 2f, 0f), new Vector3(0.15f, alto, anchoPas), matParedInterior);
+
+        // Puertas oficinas lado norte
+        string[] oficinas = { "Oficina_201", "Oficina_202", "Archivo", "Reunion", "Oficina_203", "Bano_P2" };
+        for (int i = 0; i < oficinas.Length; i++)
+        {
+            float x = -6f + i * 2.4f;
+            Cubo("Puerta_" + oficinas[i], pasillo.transform,
+                new Vector3(x, 1.1f, anchoPas / 2f - 0.06f),
+                new Vector3(0.9f, 2.2f, 0.06f), matPuertaMetal);
+            Cubo("Marco_L_" + oficinas[i], pasillo.transform,
+                new Vector3(x - 0.5f, 1.1f, anchoPas / 2f - 0.04f),
+                new Vector3(0.06f, 2.3f, 0.08f), matMarcoPuerta);
+            Cubo("Marco_R_" + oficinas[i], pasillo.transform,
+                new Vector3(x + 0.5f, 1.1f, anchoPas / 2f - 0.04f),
+                new Vector3(0.06f, 2.3f, 0.08f), matMarcoPuerta);
+        }
+
+        // Luces
+        for (int i = -3; i <= 3; i++)
+        {
+            CrearLuzPasillo(pasillo.transform, new Vector3(i * 2.5f, alto - 0.02f, 0f));
+        }
+
+        // Habitaciones sugeridas detras de pared sur
+        Cubo("ParedExt_Sur_P2", piso2.transform,
+            new Vector3(0f, alto / 2f, -anchoPas / 2f - 4f),
+            new Vector3(largoPas + 1f, alto, 0.2f), matParedExterior);
+        Cubo("Piso_Hab_P2", piso2.transform,
+            new Vector3(0f, -0.05f, -anchoPas / 2f - 2f),
+            new Vector3(largoPas + 1f, 0.1f, 4f), matPiso);
+
+        // Zocalos
+        Cubo("Zocalo_N_P2", pasillo.transform,
+            new Vector3(0f, 0.06f, anchoPas / 2f - 0.02f),
+            new Vector3(largoPas, 0.12f, 0.03f), matZocalo);
+        Cubo("Zocalo_S_P2", pasillo.transform,
+            new Vector3(0f, 0.06f, -anchoPas / 2f + 0.02f),
+            new Vector3(largoPas, 0.12f, 0.03f), matZocalo);
+
+        Debug.Log("[Edificio] Piso 2 construido: pasillo + 6 oficinas");
+    }
+
+    // =====================================================
+    //  GRADAS QUE CONECTAN TODOS LOS PISOS
+    // =====================================================
+
+    static void ConstruirGradas(Transform edificio)
+    {
+        // Caja de escaleras en el extremo este (X=7..9)
+        GameObject cajaGradas = Contenedor("CajaGradas_Edificio", edificio, new Vector3(8f, 0f, 0f));
+
+        // --- GRADAS SOTANO (Y=-4) → PISO 1 (Y=0) ---
+        CrearTramoEscalera(cajaGradas.transform, "Gradas_Sot_P1",
+            new Vector3(0f, -4f, -2f), 4f, 20, false);
+
+        // --- GRADAS PISO 1 (Y=0) → PISO 2 (Y=4) ---
+        CrearTramoEscalera(cajaGradas.transform, "Gradas_P1_P2",
+            new Vector3(0f, 0f, 0f), 4f, 20, true);
+
+        // --- GRADAS PISO 2 (Y=4) → PISO 3 (Y=8) ---
+        CrearTramoEscalera(cajaGradas.transform, "Gradas_P2_P3",
+            new Vector3(0f, 4f, 4f), 4f, 20, false);
+
+        // Paredes de la caja de escaleras (toda la altura del edificio)
+        float altoTotal = 12.5f; // de -4 a 8.5
+        float yCenter = 2f; // centro vertical
+        Cubo("Pared_E_CajaGrad", cajaGradas.transform,
+            new Vector3(1.3f, yCenter, 2f), new Vector3(0.15f, altoTotal, 12f), matParedInterior);
+        Cubo("Pared_O_CajaGrad", cajaGradas.transform,
+            new Vector3(-1.3f, yCenter, 2f), new Vector3(0.15f, altoTotal, 12f), matParedInterior);
+
+        // Luces en la caja de escaleras (una por piso)
+        float[] lucesY = { -2f, 2f, 6f };
+        for (int i = 0; i < lucesY.Length; i++)
+        {
+            GameObject lz = new GameObject($"Luz_CajaGrad_{i}");
+            lz.transform.SetParent(cajaGradas.transform);
+            lz.transform.localPosition = new Vector3(0f, lucesY[i], i * 2f);
+            Light l = lz.AddComponent<Light>();
+            l.type = LightType.Point; l.range = 5f; l.intensity = 0.5f;
+            l.color = new Color(0.75f, 0.65f, 0.5f);
+            Undo.RegisterCreatedObjectUndo(lz, "Luz caja gradas");
+        }
+
+        // Carteles de piso
+        CrearCartelPiso(cajaGradas.transform, "SOTANO", new Vector3(1.2f, -2.5f, -1.5f));
+        CrearCartelPiso(cajaGradas.transform, "PISO 1", new Vector3(1.2f, 1.5f, -0.5f));
+        CrearCartelPiso(cajaGradas.transform, "PISO 2", new Vector3(1.2f, 5.5f, 2.5f));
+        CrearCartelPiso(cajaGradas.transform, "PISO 3", new Vector3(1.2f, 9.5f, 5.5f));
+
+        // Puntos de navegacion
+        CrearPuntoNav("Spawn_Sotano", cajaGradas.transform, new Vector3(0f, -3.5f, -2.5f));
+        CrearPuntoNav("PuntoLlegada_Piso3", cajaGradas.transform, new Vector3(0f, 8.3f, 7.5f));
+        CrearPuntoNav("PuntoRetorno_Inferior", cajaGradas.transform, new Vector3(0f, 4.3f, 3.5f));
+
+        // Descanso con trigger para TrampaGradasSyntro (entre P2 y P3)
+        GameObject descansoTrigger = new GameObject("Descanso_P2P3_Trigger");
+        descansoTrigger.transform.SetParent(cajaGradas.transform);
+        descansoTrigger.transform.localPosition = new Vector3(0f, 6f, 5.8f);
+        BoxCollider bc = descansoTrigger.AddComponent<BoxCollider>();
+        bc.isTrigger = true;
+        bc.size = new Vector3(2.2f, 2f, 1.5f);
+        bc.center = new Vector3(0f, 1f, 0f);
+        Cubo("Piso_Descanso", descansoTrigger.transform,
+            Vector3.zero, new Vector3(2.2f, 0.1f, 1.5f), matEscalon);
+        Undo.RegisterCreatedObjectUndo(descansoTrigger, "Descanso trigger");
+
+        Debug.Log("[Edificio] 3 tramos de gradas construidos (Sotano→P1→P2→P3) con carteles y puntos de navegacion");
+    }
+
+    static void CrearTramoEscalera(Transform padre, string nombre, Vector3 posBase,
+        float alturaTotal, int numEscalones, bool invertirZ)
+    {
+        GameObject tramo = Contenedor(nombre, padre, posBase);
+        float dirZ = invertirZ ? -1f : 1f;
+        float alturaPorEsc = alturaTotal / numEscalones;
+        float profPorEsc = 0.2f;
+        float anchoEsc = 2.2f;
+
+        for (int i = 0; i < numEscalones; i++)
+        {
+            float y = i * alturaPorEsc;
+            float z = i * profPorEsc * dirZ;
+
+            // Escalon visible
+            GameObject esc = Cubo($"Esc_{i}", tramo.transform,
+                new Vector3(0f, y + alturaPorEsc / 2f, z),
+                new Vector3(anchoEsc, alturaPorEsc, profPorEsc), matEscalon);
+            esc.isStatic = true;
+
+            // Contrahuella (parte vertical frontal del escalon)
+            Cubo($"CH_{i}", tramo.transform,
+                new Vector3(0f, y, z - profPorEsc / 2f * dirZ),
+                new Vector3(anchoEsc, alturaPorEsc, 0.02f), matParedInterior);
+
+            // Balaustres cada 4 escalones
+            if (i % 4 == 0)
+            {
+                Cubo($"Bal_L_{i}", tramo.transform,
+                    new Vector3(-anchoEsc / 2f - 0.04f, y + 0.55f, z),
+                    new Vector3(0.04f, 1.1f, 0.04f), matBarandal);
+                Cubo($"Bal_R_{i}", tramo.transform,
+                    new Vector3(anchoEsc / 2f + 0.04f, y + 0.55f, z),
+                    new Vector3(0.04f, 1.1f, 0.04f), matBarandal);
+            }
+        }
+
+        // Pasamanos (barra superior inclinada)
+        float totalZ = numEscalones * profPorEsc;
+        float largo = Mathf.Sqrt(totalZ * totalZ + alturaTotal * alturaTotal);
+        float angulo = Mathf.Atan2(alturaTotal, totalZ) * Mathf.Rad2Deg * dirZ;
+
+        GameObject pmL = Cubo("Pasamanos_L", tramo.transform,
+            new Vector3(-anchoEsc / 2f - 0.04f, alturaTotal / 2f + 0.55f, totalZ * dirZ / 2f),
+            new Vector3(0.06f, 0.04f, largo), matBarandal);
+        pmL.transform.localRotation = Quaternion.Euler(angulo, 0f, 0f);
+
+        GameObject pmR = Cubo("Pasamanos_R", tramo.transform,
+            new Vector3(anchoEsc / 2f + 0.04f, alturaTotal / 2f + 0.55f, totalZ * dirZ / 2f),
+            new Vector3(0.06f, 0.04f, largo), matBarandal);
+        pmR.transform.localRotation = Quaternion.Euler(angulo, 0f, 0f);
+
+        // Rampa collider invisible para caminar
+        GameObject ramp = new GameObject("RampCollider");
+        ramp.transform.SetParent(tramo.transform);
+        ramp.transform.localPosition = new Vector3(0f, alturaTotal / 2f, totalZ * dirZ / 2f);
+        ramp.transform.localRotation = Quaternion.Euler(angulo, 0f, 0f);
+        BoxCollider col = ramp.AddComponent<BoxCollider>();
+        col.size = new Vector3(anchoEsc, 0.05f, largo);
+        Undo.RegisterCreatedObjectUndo(ramp, "Ramp");
+
+        // Descanso al final del tramo
+        Cubo("Descanso_" + nombre, tramo.transform,
+            new Vector3(0f, alturaTotal, totalZ * dirZ),
+            new Vector3(anchoEsc + 0.3f, 0.1f, 1.5f), matEscalon);
+    }
+
+    static void CrearCartelPiso(Transform padre, string texto, Vector3 pos)
+    {
+        GameObject cartel = Cubo("Cartel_" + texto.Replace(" ", ""), padre,
+            pos, new Vector3(0.5f, 0.35f, 0.03f), matNumero);
+        // El texto se agregaria via TextMeshPro en runtime
+    }
+
+    static void CrearPuntoNav(string nombre, Transform padre, Vector3 pos)
+    {
+        GameObject p = new GameObject(nombre);
+        p.transform.SetParent(padre);
+        p.transform.localPosition = pos;
+        Undo.RegisterCreatedObjectUndo(p, nombre);
+    }
+
+    // =====================================================
     //  EXTERIOR DEL EDIFICIO (fachada visible)
     // =====================================================
 
@@ -585,10 +893,16 @@ public class EdificioSyntro : EditorWindow
             new Vector3(-largoEdificio / 2f, altoPiso / 2f, -3f),
             new Vector3(0.25f, altoPiso, anchoEdificio), matParedExterior);
 
-        // === ENTREPISO (losa entre P1 y P3) ===
-        Cubo("Losa_Entrepiso", exterior.transform,
+        // === ENTREPISOS ===
+        Cubo("Losa_SotP1", exterior.transform,
+            new Vector3(0f, 0f, -3f),
+            new Vector3(largoEdificio, 0.2f, anchoEdificio), matParedExterior);
+        Cubo("Losa_P1P2", exterior.transform,
             new Vector3(0f, altoPiso, -3f),
-            new Vector3(largoEdificio, 0.3f, anchoEdificio), matParedExterior);
+            new Vector3(largoEdificio, 0.2f, anchoEdificio), matParedExterior);
+        Cubo("Losa_P2P3", exterior.transform,
+            new Vector3(0f, 8f, -3f),
+            new Vector3(largoEdificio, 0.2f, anchoEdificio), matParedExterior);
 
         // === PISO 3: Muros exteriores ===
         float y3 = 8f;
