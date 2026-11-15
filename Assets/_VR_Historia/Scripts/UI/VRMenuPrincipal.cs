@@ -9,7 +9,7 @@ public class VRMenuPrincipal : MonoBehaviour
     [Header("Botones")]
     [SerializeField] private Button btnNuevaPartida;
     [SerializeField] private Button btnContinuar;
-    [SerializeField] private Button btnSimulacionISTR;
+    [SerializeField] private Button btnSimulacionSyntro;
     [SerializeField] private Button btnCapitulo1;
     [SerializeField] private Button btnCapitulo2;
     [SerializeField] private Button btnCapitulo3;
@@ -26,7 +26,7 @@ public class VRMenuPrincipal : MonoBehaviour
     [SerializeField] private string escenaCapitulo1 = "HistoriaCapitulo1_Despertar";
     [SerializeField] private string escenaCapitulo2 = "HistoriaCapitulo2_Exploracion";
     [SerializeField] private string escenaCapitulo3 = "HistoriaCapitulo3_Revelacion";
-    [SerializeField] private string escenaISTR = "SimulacionISTR";
+    [SerializeField] private string escenaSyntro = "SimulacionSyntro";
 
     [Header("Fade")]
     [SerializeField] private VRFadeScreen fadeScreen;
@@ -37,8 +37,8 @@ public class VRMenuPrincipal : MonoBehaviour
             btnNuevaPartida.onClick.AddListener(NuevaPartida);
         if (btnContinuar != null)
             btnContinuar.onClick.AddListener(ContinuarPartida);
-        if (btnSimulacionISTR != null)
-            btnSimulacionISTR.onClick.AddListener(IniciarISTR);
+        if (btnSimulacionSyntro != null)
+            btnSimulacionSyntro.onClick.AddListener(IniciarSyntro);
         if (btnCapitulo1 != null)
             btnCapitulo1.onClick.AddListener(() => CargarCapitulo(escenaCapitulo1, Capitulo.Despertar));
         if (btnCapitulo2 != null)
@@ -93,9 +93,9 @@ public class VRMenuPrincipal : MonoBehaviour
         }
     }
 
-    void IniciarISTR()
+    void IniciarSyntro()
     {
-        StartCoroutine(CargarEscena(escenaISTR));
+        StartCoroutine(CargarEscena(escenaSyntro));
     }
 
     void CargarCapitulo(string escena, Capitulo capitulo)

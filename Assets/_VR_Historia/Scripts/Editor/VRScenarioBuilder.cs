@@ -22,7 +22,7 @@ public class VRScenarioBuilder : EditorWindow
             "- HistoriaCapitulo1_Despertar\n" +
             "- HistoriaCapitulo2_Exploracion\n" +
             "- HistoriaCapitulo3_Revelacion\n" +
-            "- SimulacionISTR\n" +
+            "- SimulacionSyntro\n" +
             "- MenuPrincipalVR\n\n" +
             "Ademas creara ScriptableObjects y prefabs de ejemplo.\n\n" +
             "Continuar?", "Construir", "Cancelar"))
@@ -35,7 +35,7 @@ public class VRScenarioBuilder : EditorWindow
         ConstruirEscenaCapitulo1();
         ConstruirEscenaCapitulo2();
         ConstruirEscenaCapitulo3();
-        ConstruirEscenaISTR();
+        ConstruirEscenaSyntro();
         AgregarEscenasAlBuild();
 
         EditorUtility.DisplayDialog("VR Historia", "Todos los escenarios han sido construidos.", "OK");
@@ -53,8 +53,8 @@ public class VRScenarioBuilder : EditorWindow
     [MenuItem("VR Historia/Construir Solo Capitulo 3", priority = 13)]
     public static void SoloConstruirCap3() { EnsureDirectories(); ConstruirEscenaCapitulo3(); }
 
-    [MenuItem("VR Historia/Construir Solo ISTR", priority = 14)]
-    public static void SoloConstruirISTR() { EnsureDirectories(); ConstruirEscenaISTR(); }
+    [MenuItem("VR Historia/Construir Solo Syntro", priority = 14)]
+    public static void SoloConstruirSyntro() { EnsureDirectories(); ConstruirEscenaSyntro(); }
 
     [MenuItem("VR Historia/Crear ScriptableObjects de Ejemplo", priority = 20)]
     public static void SoloCrearSOs() { EnsureDirectories(); CrearScriptableObjects(); }
@@ -410,9 +410,9 @@ public class VRScenarioBuilder : EditorWindow
             "ent_03|???|Ahora debes elegir. No hay vuelta atras.|Surprised"
         });
 
-        CrearDialogoEjemplo("DG_ISTR_Intro", "ISTR Intro", new string[] {
-            "...|Sistema|Bienvenido al turno nocturno del edificio ISTR.|Neutral",
-            "istr_02|Sistema|Su tarea: monitorear los servidores. Todo parece normal... por ahora.|Neutral"
+        CrearDialogoEjemplo("DG_Syntro_Intro", "Syntro Intro", new string[] {
+            "...|Sistema|Bienvenido al turno nocturno del edificio Syntro.|Neutral",
+            "syntro_02|Sistema|Su tarea: monitorear los servidores. Todo parece normal... por ahora.|Neutral"
         });
 
         // Teleport Zones
@@ -424,10 +424,10 @@ public class VRScenarioBuilder : EditorWindow
         CrearTeleportZone("zona_sotano", "Sotano", false, new Vector3(-10, -3, 0), "HistoriaCapitulo2_Exploracion");
         CrearTeleportZone("zona_archivo", "Sala de Archivos", false, new Vector3(-10, -3, 15), "HistoriaCapitulo2_Exploracion");
         CrearTeleportZone("zona_revelacion", "Tercer Piso", false, Vector3.zero, "HistoriaCapitulo3_Revelacion");
-        CrearTeleportZone("istr_piso1", "ISTR Piso 1", true, Vector3.zero, "SimulacionISTR");
-        CrearTeleportZone("istr_gradas", "ISTR Gradas", false, new Vector3(0, 5, 0), "SimulacionISTR");
-        CrearTeleportZone("istr_piso3", "ISTR Piso 3", false, new Vector3(0, 10, 0), "SimulacionISTR");
-        CrearTeleportZone("istr_laboratorio", "ISTR Laboratorio", false, new Vector3(10, 10, 0), "SimulacionISTR");
+        CrearTeleportZone("syntro_piso1", "Syntro Piso 1", true, Vector3.zero, "SimulacionSyntro");
+        CrearTeleportZone("syntro_gradas", "Syntro Gradas", false, new Vector3(0, 5, 0), "SimulacionSyntro");
+        CrearTeleportZone("syntro_piso3", "Syntro Piso 3", false, new Vector3(0, 10, 0), "SimulacionSyntro");
+        CrearTeleportZone("syntro_laboratorio", "Syntro Laboratorio", false, new Vector3(10, 10, 0), "SimulacionSyntro");
 
         // World Map
         CrearWorldMap();
@@ -612,7 +612,7 @@ public class VRScenarioBuilder : EditorWindow
         titleRect.anchoredPosition = new Vector2(0, 220);
         titleRect.sizeDelta = new Vector2(700, 80);
 
-        string[] btnNames = { "Nueva Partida", "Continuar", "Simulacion ISTR", "Capitulo 1", "Capitulo 2", "Capitulo 3", "Salir" };
+        string[] btnNames = { "Nueva Partida", "Continuar", "Simulacion Syntro", "Capitulo 1", "Capitulo 2", "Capitulo 3", "Salir" };
         for (int i = 0; i < btnNames.Length; i++)
         {
             var btnObj = new GameObject("Btn_" + btnNames[i].Replace(" ", ""));
@@ -946,9 +946,9 @@ public class VRScenarioBuilder : EditorWindow
     //  ESCENA: SIMULACION ISTR
     // ===========================================
 
-    static void ConstruirEscenaISTR()
+    static void ConstruirEscenaSyntro()
     {
-        var scene = CrearEscenaNueva("SimulacionISTR");
+        var scene = CrearEscenaNueva("SimulacionSyntro");
         CrearIluminacionBase();
 
         var xrOrigin = CrearXROrigin();
@@ -1089,26 +1089,26 @@ public class VRScenarioBuilder : EditorWindow
         CrearLuzPuntual("Luz_P3_1", new Vector3(0, 12.5f, 0), new Color(0.1f, 0.1f, 0.2f), 0.5f, 15f);
 
         // Zonas de teleport
-        CrearZonaTeleport("ISTR_Piso1", new Vector3(0, 0.01f, -10), new Color(0, 1, 0, 0.3f));
-        CrearZonaTeleport("ISTR_Gradas", new Vector3(20, 0.01f, 0), new Color(1, 1, 0, 0.3f));
-        CrearZonaTeleport("ISTR_Piso3", new Vector3(0, 10.01f, -8), new Color(1, 0, 0, 0.3f));
-        CrearZonaTeleport("ISTR_Lab", new Vector3(5, 10.01f, 5), new Color(0.5f, 0, 1, 0.3f));
+        CrearZonaTeleport("Syntro_Piso1", new Vector3(0, 0.01f, -10), new Color(0, 1, 0, 0.3f));
+        CrearZonaTeleport("Syntro_Gradas", new Vector3(20, 0.01f, 0), new Color(1, 1, 0, 0.3f));
+        CrearZonaTeleport("Syntro_Piso3", new Vector3(0, 10.01f, -8), new Color(1, 0, 0, 0.3f));
+        CrearZonaTeleport("Syntro_Lab", new Vector3(5, 10.01f, 5), new Color(0.5f, 0, 1, 0.3f));
 
         // Audio
         var audioParent = new GameObject("--- AUDIO ---");
         CrearMusicaAmbiente("MusicaAmbiente", audioParent.transform);
         CrearMusicaAmbiente("SFXChannel", audioParent.transform);
 
-        // Gestor Historia ISTR
-        var gestorObj = new GameObject("GestorHistoriaISTR");
-        gestorObj.AddComponent<GestorHistoriaISTR>();
+        // Gestor Historia Syntro
+        var gestorObj = new GameObject("GestorHistoriaSyntro");
+        gestorObj.AddComponent<GestorHistoriaSyntro>();
 
-        // Controlador ISTR VR
-        var istrController = new GameObject("SimulacionISTRController");
-        istrController.AddComponent<SimulacionISTRController>();
+        // Controlador Syntro VR
+        var istrController = new GameObject("SimulacionSyntroController");
+        istrController.AddComponent<SimulacionSyntroController>();
 
         EditorSceneManager.SaveScene(scene);
-        Debug.Log("[VRScenarioBuilder] Escena ISTR construida.");
+        Debug.Log("[VRScenarioBuilder] Escena Syntro construida.");
     }
 
     // ===========================================
@@ -1123,7 +1123,7 @@ public class VRScenarioBuilder : EditorWindow
             SCENES_PATH + "HistoriaCapitulo1_Despertar.unity",
             SCENES_PATH + "HistoriaCapitulo2_Exploracion.unity",
             SCENES_PATH + "HistoriaCapitulo3_Revelacion.unity",
-            SCENES_PATH + "SimulacionISTR.unity"
+            SCENES_PATH + "SimulacionSyntro.unity"
         };
 
         foreach (var path in nuevasEscenas)

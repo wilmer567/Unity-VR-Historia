@@ -25,7 +25,7 @@ All horror game content lives under `Assets/_VR_Historia/`:
   - `Atmosphere/` — ambient sound, post-processing
   - `Dialogue/` — DialogueGraph, VRDialogueManager, VRSubtitleDisplay
   - `Interaction/` — InteractionProfile, VRInteractableObject, VRInteractionManager
-  - `ISTR/` — 22 scripts for the ISTR building simulation (terror scenarios, rooms, audio, visuals)
+  - `Syntro/` — 22 scripts for the Syntro building simulation (terror scenarios, rooms, audio, visuals)
   - `Scenes/` — chapter controllers (Despertar, Exploracion, Revelacion)
   - `Teleport/` — TeleportZone, VRTeleportManager, WorldMap
   - `UI/` — VRFadeScreen, VRHUD, VRMenuPrincipal
