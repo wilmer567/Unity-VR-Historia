@@ -354,54 +354,77 @@ public class DisenoSalaServidores : EditorWindow
 
         GameObject contenedor = CrearContenedor("Racks_Fila2_DC", sala.transform, Vector3.zero);
 
-        float[] posicionesX = { -3.5f, -1.5f, 0.5f, 2.5f, 4f };
-        string[] nombres = { "Rack_Network_1", "Rack_Storage_1", "Rack_Storage_2", "Rack_Network_2", "Rack_PDU" };
+        float[] posicionesX = { -4.5f, -2.5f, -0.5f, 1.5f, 3.5f, 5.5f };
+        string[] nombres = { "Rack_Network_1", "Rack_Storage_1", "Rack_Blade_1", "Rack_Storage_2", "Rack_Network_2", "Rack_PDU" };
 
         for (int i = 0; i < posicionesX.Length; i++)
         {
             GameObject rack = CrearContenedor(nombres[i], contenedor.transform,
                 new Vector3(posicionesX[i], 0f, -2f));
 
-            // Cuerpo del rack
+            // Cuerpo del rack (42U estandar: 0.8m ancho x 2.2m alto x 1.0m profundo)
             CrearCubo("Cuerpo", rack.transform,
-                new Vector3(0f, 1.1f, 0f), new Vector3(0.6f, 2.0f, 0.7f), matMetalOscuro);
+                new Vector3(0f, 1.1f, 0f), new Vector3(0.8f, 2.2f, 1.0f), matMetalOscuro);
+
+            // Patas/base del rack
+            CrearCubo("Base", rack.transform,
+                new Vector3(0f, 0.02f, 0f), new Vector3(0.82f, 0.04f, 1.02f), matMetal);
 
             // Marco frontal
             CrearCubo("Marco_L", rack.transform,
-                new Vector3(-0.28f, 1.1f, -0.36f), new Vector3(0.03f, 2.0f, 0.02f), matMetal);
+                new Vector3(-0.38f, 1.1f, -0.51f), new Vector3(0.03f, 2.2f, 0.02f), matMetal);
             CrearCubo("Marco_R", rack.transform,
-                new Vector3(0.28f, 1.1f, -0.36f), new Vector3(0.03f, 2.0f, 0.02f), matMetal);
+                new Vector3(0.38f, 1.1f, -0.51f), new Vector3(0.03f, 2.2f, 0.02f), matMetal);
+            CrearCubo("Marco_Top", rack.transform,
+                new Vector3(0f, 2.22f, -0.51f), new Vector3(0.8f, 0.02f, 0.02f), matMetal);
 
-            // Unidades (dispositivos montados)
-            int numUnidades = Random.Range(6, 10);
+            // Unidades (dispositivos montados) — mas unidades, mas grandes
+            int numUnidades = Random.Range(10, 16);
             for (int u = 0; u < numUnidades; u++)
             {
-                float yUnit = 0.2f + u * 0.2f;
-                float altUnit = Random.Range(0.04f, 0.12f);
+                float yUnit = 0.15f + u * 0.135f;
+                float altUnit = Random.Range(0.06f, 0.1f);
 
                 CrearCubo($"Unidad_{u}", rack.transform,
-                    new Vector3(0f, yUnit, -0.34f),
-                    new Vector3(0.52f, altUnit, 0.02f),
+                    new Vector3(0f, yUnit, -0.5f),
+                    new Vector3(0.72f, altUnit, 0.03f),
                     (u % 3 == 0) ? matMetal : matMetalOscuro);
 
-                // LEDs por unidad
-                int numLeds = Random.Range(2, 5);
+                // Manijas frontales
+                CrearCubo($"Manija_L_{u}", rack.transform,
+                    new Vector3(-0.32f, yUnit, -0.52f), new Vector3(0.04f, 0.02f, 0.01f), matMetal);
+                CrearCubo($"Manija_R_{u}", rack.transform,
+                    new Vector3(0.32f, yUnit, -0.52f), new Vector3(0.04f, 0.02f, 0.01f), matMetal);
+
+                // LEDs por unidad — mas LEDs
+                int numLeds = Random.Range(3, 7);
                 for (int l = 0; l < numLeds; l++)
                 {
-                    float ledX = -0.2f + l * 0.1f;
-                    Material ledMat = (Random.value > 0.4f) ? matLedVerde : matLedRojo;
+                    float ledX = -0.28f + l * 0.09f;
+                    Material ledMat = (Random.value > 0.35f) ? matLedVerde : matLedRojo;
                     CrearEsfera($"LED_{u}_{l}", rack.transform,
-                        new Vector3(ledX, yUnit, -0.36f),
-                        new Vector3(0.015f, 0.015f, 0.015f), ledMat);
+                        new Vector3(ledX, yUnit, -0.52f),
+                        new Vector3(0.018f, 0.018f, 0.018f), ledMat);
                 }
             }
 
+            // Pantalla LCD de status en la parte superior
+            CrearCubo("LCD_Panel", rack.transform,
+                new Vector3(0f, 2.0f, -0.51f), new Vector3(0.3f, 0.12f, 0.015f), matPantalla);
+
             // Etiqueta identificadora
             CrearCubo("Etiqueta", rack.transform,
-                new Vector3(0f, 2.05f, -0.36f), new Vector3(0.25f, 0.06f, 0.005f), matSenal);
+                new Vector3(0f, 2.18f, -0.51f), new Vector3(0.3f, 0.06f, 0.005f), matSenal);
+
+            // Ventilacion superior
+            for (int v = 0; v < 3; v++)
+            {
+                CrearCubo($"Vent_{v}", rack.transform,
+                    new Vector3(-0.2f + v * 0.2f, 2.21f, 0f), new Vector3(0.15f, 0.005f, 0.6f), matMetal);
+            }
         }
 
-        Debug.Log("[SalaServ] 5 racks adicionales (fila 2) con unidades y LEDs");
+        Debug.Log("[SalaServ] 6 racks grandes (42U, 0.8x2.2x1.0m) con unidades, LEDs y LCDs");
     }
 
     // =====================================================
@@ -416,17 +439,25 @@ public class DisenoSalaServidores : EditorWindow
         {
             Transform rack = sala.transform.Find(nombre);
             if (rack == null) continue;
+
+            // Escalar racks existentes para que sean mas grandes (42U estandar)
+            if (rack.Find("Escalado_DC") == null)
+            {
+                rack.localScale = new Vector3(1.35f, 1.1f, 1.4f);
+                CrearContenedor("Escalado_DC", rack, Vector3.zero);
+            }
+
             if (rack.Find("LEDs_DC") != null) continue;
 
             GameObject ledsContainer = CrearContenedor("LEDs_DC", rack, Vector3.zero);
 
-            // LEDs en el frente
-            for (int fila = 0; fila < 12; fila++)
+            // LEDs en el frente — mas LEDs, mas grandes
+            for (int fila = 0; fila < 16; fila++)
             {
-                float y = -0.35f + fila * 0.065f;
-                for (int col = 0; col < 4; col++)
+                float y = -0.4f + fila * 0.055f;
+                for (int col = 0; col < 6; col++)
                 {
-                    float x = -0.15f + col * 0.08f;
+                    float x = -0.2f + col * 0.07f;
                     Material ledMat;
                     float prob = Random.value;
                     if (prob < 0.5f) ledMat = matLedVerde;
@@ -435,23 +466,27 @@ public class DisenoSalaServidores : EditorWindow
 
                     CrearEsfera($"LED_{fila}_{col}", ledsContainer.transform,
                         new Vector3(x, y, -0.52f),
-                        new Vector3(0.012f, 0.012f, 0.012f), ledMat);
+                        new Vector3(0.016f, 0.016f, 0.016f), ledMat);
                 }
             }
 
             // Patch cables en frente
-            for (int c = 0; c < 6; c++)
+            for (int c = 0; c < 8; c++)
             {
-                float cx = -0.18f + c * 0.065f;
-                float cy1 = -0.2f + Random.Range(0f, 0.15f);
-                float cy2 = 0.1f + Random.Range(0f, 0.15f);
+                float cx = -0.22f + c * 0.06f;
+                float cy1 = -0.25f + Random.Range(0f, 0.2f);
+                float cy2 = 0.15f + Random.Range(0f, 0.2f);
                 CrearCubo($"PatchCable_{c}", ledsContainer.transform,
                     new Vector3(cx, (cy1 + cy2) / 2f, -0.51f),
                     new Vector3(0.008f, Mathf.Abs(cy2 - cy1), 0.008f), matCable);
             }
+
+            // Pantalla LCD de status en la parte superior del rack
+            CrearCubo("LCD_Rack", ledsContainer.transform,
+                new Vector3(0f, 0.42f, -0.52f), new Vector3(0.25f, 0.1f, 0.012f), matPantalla);
         }
 
-        Debug.Log("[SalaServ] LEDs y patch cables agregados a racks existentes");
+        Debug.Log("[SalaServ] LEDs, patch cables y LCDs agregados a racks existentes (escalados x1.35)");
     }
 
     // =====================================================

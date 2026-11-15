@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNTRO // Terminal Subterranea VR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes Google: Orbitron para titulos tecnologicos y Share Tech Mono para estilo terminal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --crimson: #dc2626;
+            --crimson-dark: #450a0a;
+            --crimson-glow: rgba(220, 38, 38, 0.55);
+            --bg-void: #040405;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-void);
+            color: #e5e5e5;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+        }
+
+        /* Fondo de cuadricula tecnica sutil */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(220, 38, 38, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(220, 38, 38, 0.04) 1px, transparent 1px);
+        }
+
+        /* Efecto Scanlines (lineas de monitor CRT) */
+        .crt-scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.45) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Vineta oscura claustrofobica */
+        .vignette {
+            background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.92) 100%);
+            pointer-events: none;
+        }
+
+        /* Parpadeo sutil de pantalla CRT */
+        @keyframes crtFlicker {
+            0% { opacity: 0.98; }
+            5% { opacity: 0.94; }
+            10% { opacity: 0.99; }
+            50% { opacity: 0.97; }
+            55% { opacity: 0.92; }
+            60% { opacity: 0.99; }
+            100% { opacity: 0.98; }
+        }
+        .flicker-layer {
+            animation: crtFlicker 6s infinite;
+        }
+
+        /* Titulo principal y efecto Glitch */
+        .title-font {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.35em;
+            margin-right: -0.35em;
+        }
+
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch {
+            position: relative;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff003c;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00f0ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 3.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0%, 92% { clip: rect(0, 0, 0, 0); transform: translate(0); }
+            93% { clip: rect(12px, 9999px, 38px, 0); transform: translate(-3px, 1px); }
+            94% { clip: rect(65px, 9999px, 85px, 0); transform: translate(3px, -1px); }
+            95% { clip: rect(25px, 9999px, 45px, 0); transform: translate(-2px, 0); }
+            96% { clip: rect(0, 0, 0, 0); transform: translate(0); }
+            98% { clip: rect(42px, 9999px, 62px, 0); transform: translate(4px, 1px); }
+            100% { clip: rect(0, 0, 0, 0); transform: translate(0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0%, 88% { clip: rect(0, 0, 0, 0); transform: translate(0); }
+            89% { clip: rect(55px, 9999px, 75px, 0); transform: translate(3px, -2px); }
+            90% { clip: rect(10px, 9999px, 28px, 0); transform: translate(-3px, 2px); }
+            91% { clip: rect(0, 0, 0, 0); transform: translate(0); }
+            97% { clip: rect(30px, 9999px, 50px, 0); transform: translate(-4px, 0); }
+            100% { clip: rect(0, 0, 0, 0); transform: translate(0); }
+        }
+
+        /* Boton principal estilo ciberseguridad comprometida */
+        .btn-protocol {
+            position: relative;
+            background: linear-gradient(180deg, rgba(127, 29, 29, 0.35) 0%, rgba(69, 10, 10, 0.7) 100%);
+            border: 1px solid rgba(220, 38, 38, 0.6);
+            box-shadow: 0 0 25px rgba(153, 27, 27, 0.25), inset 0 0 15px rgba(220, 38, 38, 0.15);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        .btn-protocol::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.35), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-protocol:hover {
+            background: linear-gradient(180deg, rgba(185, 28, 28, 0.65) 0%, rgba(127, 29, 29, 0.9) 100%);
+            border-color: #ef4444;
+            box-shadow: 0 0 35px var(--crimson-glow), inset 0 0 20px rgba(248, 113, 113, 0.3);
+            transform: translateY(-2px);
+            letter-spacing: 0.28em;
+        }
+
+        .btn-protocol:hover::before {
+            left: 100%;
+        }
+
+        .btn-protocol:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Esquinas tacticas (HUD brackets) */
+        .hud-corner {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-color: rgba(220, 38, 38, 0.55);
+            pointer-events: none;
+        }
+
+        /* Cursor parpadeante de terminal */
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #ef4444;
+            vertical-align: middle;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+        }
+
+        /* Transicion de inmersion al presionar iniciar */
+        @keyframes diveEffect {
+            0% { transform: scale(1); filter: brightness(1) contrast(1); opacity: 1; }
+            40% { transform: scale(1.04); filter: brightness(1.8) contrast(2) hue-rotate(-15deg); opacity: 0.9; }
+            100% { transform: scale(1.25); filter: brightness(0) contrast(3); opacity: 0; }
+        }
+        .diving {
+            animation: diveEffect 1.6s forwards cubic-bezier(0.7, 0, 0.84, 0);
+        }
+    </style>
+</head>
+<body class="bg-grid flicker-layer relative flex flex-col justify-between min-h-screen p-4 sm:p-8">
+
+    <!-- Canvas de particulas de polvo / estatica flotante -->
+    <canvas id="dustCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Capas atmosfericas CRT y Vineta -->
+    <div class="crt-scanlines fixed inset-0 z-40"></div>
+    <div class="vignette fixed inset-0 z-30"></div>
+
+    <!-- Marcos de esquina HUD -->
+    <div class="hud-corner top-3 left-3 sm:top-6 sm:left-6 border-t-2 border-l-2 z-20"></div>
+    <div class="hud-corner top-3 right-3 sm:top-6 sm:right-6 border-t-2 border-r-2 z-20"></div>
+    <div class="hud-corner bottom-3 left-3 sm:bottom-6 sm:left-6 border-b-2 border-l-2 z-20"></div>
+    <div class="hud-corner bottom-3 right-3 sm:bottom-6 sm:right-6 border-b-2 border-r-2 z-20"></div>
+
+    <!-- BARRA SUPERIOR: TELEMETRIA DEL SISTEMA -->
+    <header class="relative z-20 flex flex-wrap justify-between items-start gap-4 text-xs sm:text-sm tracking-widest uppercase text-neutral-400">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                <span class="text-red-500 font-bold">CONEXION: INESTABLE</span>
+            </div>
+            <div class="text-neutral-500 text-xs">NODO: SUB-04 // PROFUNDIDAD -420M</div>
+        </div>
+
+        <!-- Boton de Audio Atmosferico (Web Audio API) -->
+        <div class="flex items-center gap-4">
+            <button id="audioToggle" class="flex items-center gap-2 px-3 py-1.5 rounded border border-neutral-800 bg-black/60 hover:border-red-800 hover:text-red-400 transition-colors cursor-pointer text-xs">
+                <svg id="audioIconOff" class="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+                <svg id="audioIconOn" class="w-4 h-4 text-red-500 hidden animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+                <span id="audioLabel">AUDIO: SILENCIADO</span>
+            </button>
+        </div>
+
+        <div class="text-right space-y-1 hidden sm:block">
+            <div class="text-neutral-300">LATENCIA VR: <span id="latencyVal" class="text-red-400">12ms</span></div>
+            <div class="text-neutral-500 text-xs">OXIGENO SECTOR: <span id="oxygenVal" class="text-amber-500">64%</span></div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO CENTRAL -->
+    <main id="mainContainer" class="relative z-20 flex flex-col items-center justify-center text-center my-auto px-2 max-w-3xl mx-auto w-full">
+
+        <!-- Etiqueta superior de advertencia -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-red-900/60 bg-red-950/20 text-red-500 text-xs tracking-[0.25em] uppercase">
+            <span>&#9888;</span>
+            <span>CONTENCION DE SERVIDORES COMPROMETIDA</span>
+        </div>
+
+        <!-- Titulo Principal con Glitch -->
+        <div class="glitch-wrapper mb-3">
+            <h1 class="glitch title-font text-5xl sm:text-7xl md:text-8xl font-black text-white select-none" data-text="SYNTRO">
+                SYNTRO
+            </h1>
+        </div>
+
+        <!-- Subtitulo Atmosferico -->
+        <p class="text-neutral-400 italic text-base sm:text-xl tracking-[0.2em] mb-8 font-light">
+            Experiencia de Terror en Realidad Virtual
+        </p>
+
+        <!-- Consola de Registro / Terminal Animada -->
+        <div class="w-full max-w-xl bg-black/75 border border-neutral-800/90 rounded-md p-4 mb-9 text-left shadow-2xl backdrop-blur-sm relative overflow-hidden">
+            <div class="flex items-center justify-between border-b border-neutral-800/80 pb-2 mb-3 text-[11px] text-neutral-500">
+                <span>TERMINAL_SYS_LOG.SH</span>
+                <span class="text-red-500/80">&#9679; REC</span>
+            </div>
+            <div id="terminalLog" class="text-xs sm:text-sm leading-relaxed text-neutral-300 min-h-[76px] space-y-1.5 font-mono">
+            </div>
+        </div>
+
+        <!-- Boton de Accion Principal -->
+        <div class="w-full max-w-sm flex flex-col items-center">
+            <button id="startBtn" class="btn-protocol w-full py-4 px-8 rounded text-white font-bold text-base sm:text-lg tracking-[0.22em] uppercase cursor-pointer">
+                INICIAR PROTOCOLO
+            </button>
+
+            <!-- Subtexto inmersivo -->
+            <p id="subHint" class="mt-4 text-xs text-neutral-500 tracking-widest uppercase">
+                Se recomienda el uso de auriculares // Ponte el visor VR
+            </p>
+        </div>
+
+    </main>
+
+    <!-- BARRA INFERIOR: ESTADO CRITICO Y ADVERTENCIA -->
+    <footer class="relative z-20 flex flex-wrap justify-between items-end gap-2 text-[11px] text-neutral-600 tracking-widest uppercase">
+        <div>
+            <span>SYS.VER 4.09.2 // KERNEL CORRUPTO</span>
+        </div>
+        <div class="text-red-900/90 font-semibold animate-pulse">
+            NO MIRES ATRAS CUANDO CAIGA LA RED
+        </div>
+        <div class="hidden sm:block">
+            <span id="clockDisplay">03:14:00 AM</span>
+        </div>
+    </footer>
+
+    <!-- Pantalla de transicion al iniciar -->
+    <div id="transitionOverlay" class="fixed inset-0 bg-black z-50 pointer-events-none opacity-0 transition-opacity duration-1000 flex flex-col items-center justify-center p-6 text-center">
+        <div class="text-red-600 text-sm sm:text-base tracking-[0.3em] uppercase mb-2 animate-pulse">
+            ESTABLECIENDO ENLACE NEURONAL...
+        </div>
+        <div class="text-neutral-500 text-xs tracking-widest" id="descendStatus">
+            DESCENDIENDO AL NIVEL SUBTERRANEO
+        </div>
+        <button id="resetDemoBtn" class="mt-8 px-4 py-2 border border-neutral-800 text-neutral-500 hover:text-white hover:border-neutral-600 text-xs uppercase tracking-widest rounded hidden pointer-events-auto cursor-pointer">
+            [ Reiniciar Pantalla de Inicio ]
+        </button>
+    </div>
+
+    <script>
+        /**
+         * SINTETIZADOR DE AUDIO AMBIENTAL Y EFECTOS (Web Audio API)
+         */
+        class HorrorAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.isPlaying = false;
+                this.masterGain = null;
+                this.droneOsc1 = null;
+                this.droneOsc2 = null;
+            }
+
+            init() {
+                if (this.ctx) return;
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+
+                this.masterGain = this.ctx.createGain();
+                this.masterGain.gain.value = 0.25;
+                this.masterGain.connect(this.ctx.destination);
+            }
+
+            toggleAmbient() {
+                this.init();
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+
+                if (this.isPlaying) {
+                    this.stopAmbient();
+                    return false;
+                } else {
+                    this.startAmbient();
+                    return true;
+                }
+            }
+
+            startAmbient() {
+                const now = this.ctx.currentTime;
+
+                this.droneOsc1 = this.ctx.createOscillator();
+                this.droneOsc1.type = 'sawtooth';
+                this.droneOsc1.frequency.setValueAtTime(52, now);
+
+                this.droneOsc2 = this.ctx.createOscillator();
+                this.droneOsc2.type = 'triangle';
+                this.droneOsc2.frequency.setValueAtTime(53.5, now);
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(140, now);
+
+                const droneGain = this.ctx.createGain();
+                droneGain.gain.setValueAtTime(0.01, now);
+                droneGain.gain.linearRampToValueAtTime(0.35, now + 2.5);
+
+                this.droneOsc1.connect(filter);
+                this.droneOsc2.connect(filter);
+                filter.connect(droneGain);
+                droneGain.connect(this.masterGain);
+
+                this.droneOsc1.start();
+                this.droneOsc2.start();
+                this.isPlaying = true;
+            }
+
+            stopAmbient() {
+                if (this.droneOsc1) {
+                    try { this.droneOsc1.stop(); } catch(e) {}
+                    this.droneOsc1.disconnect();
+                }
+                if (this.droneOsc2) {
+                    try { this.droneOsc2.stop(); } catch(e) {}
+                    this.droneOsc2.disconnect();
+                }
+                this.isPlaying = false;
+            }
+
+            playHoverSound() {
+                if (!this.isPlaying || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.08);
+
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start(now);
+                osc.stop(now + 0.09);
+            }
+
+            playDescendSound() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(110, now);
+                osc.frequency.exponentialRampToValueAtTime(24, now + 1.5);
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, now);
+                filter.frequency.exponentialRampToValueAtTime(50, now + 1.5);
+
+                gain.gain.setValueAtTime(0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.masterGain);
+
+                osc.start(now);
+                osc.stop(now + 1.65);
+            }
+        }
+
+        const audioEngine = new HorrorAudioEngine();
+
+        const audioToggle = document.getElementById('audioToggle');
+        const audioIconOff = document.getElementById('audioIconOff');
+        const audioIconOn = document.getElementById('audioIconOn');
+        const audioLabel = document.getElementById('audioLabel');
+
+        audioToggle.addEventListener('click', () => {
+            const active = audioEngine.toggleAmbient();
+            if (active) {
+                audioIconOff.classList.add('hidden');
+                audioIconOn.classList.remove('hidden');
+                audioLabel.textContent = 'AUDIO: ACTIVO';
+                audioLabel.classList.add('text-red-400');
+            } else {
+                audioIconOn.classList.add('hidden');
+                audioIconOff.classList.remove('hidden');
+                audioLabel.textContent = 'AUDIO: SILENCIADO';
+                audioLabel.classList.remove('text-red-400');
+            }
+        });
+
+        /**
+         * EFECTO DE ESCRITURA EN TERMINAL (TYPEWRITER LOG)
+         */
+        const terminalLines = [
+            { text: "> Verificando enlace con la superficie... [ERROR 503]", color: "text-red-400" },
+            { text: "> ADVERTENCIA: Anomalia detectada en el rack de memoria 09.", color: "text-amber-400" },
+            { text: "> La conexion externa se ha perdido. Algo sigue dentro de la red.", color: "text-neutral-200" }
+        ];
+
+        const terminalContainer = document.getElementById('terminalLog');
+
+        async function runTerminalSequence() {
+            terminalContainer.innerHTML = '';
+            for (let i = 0; i < terminalLines.length; i++) {
+                const lineObj = terminalLines[i];
+                const p = document.createElement('div');
+                p.className = lineObj.color;
+                terminalContainer.appendChild(p);
+
+                const cursor = document.createElement('span');
+                cursor.className = 'cursor-blink';
+                p.appendChild(cursor);
+
+                for (let charIndex = 0; charIndex < lineObj.text.length; charIndex++) {
+                    cursor.insertAdjacentText('beforebegin', lineObj.text[charIndex]);
+                    await new Promise(r => setTimeout(r, 26 + Math.random() * 25));
+                }
+
+                if (i < terminalLines.length - 1) {
+                    cursor.remove();
+                    await new Promise(r => setTimeout(r, 400));
+                }
+            }
+        }
+
+        /**
+         * TELEMETRIA DINAMICA
+         */
+        const latencyEl = document.getElementById('latencyVal');
+        const oxygenEl = document.getElementById('oxygenVal');
+        let oxygenLevel = 64;
+
+        setInterval(() => {
+            const ms = Math.floor(11 + Math.random() * 18);
+            latencyEl.textContent = `${ms}ms`;
+            latencyEl.className = ms > 24 ? 'text-red-500 font-bold' : 'text-red-400';
+
+            if (Math.random() > 0.75 && oxygenLevel > 12) {
+                oxygenLevel -= 1;
+                oxygenEl.textContent = `${oxygenLevel}%`;
+                if (oxygenLevel < 30) oxygenEl.className = 'text-red-500 animate-pulse';
+            }
+        }, 2500);
+
+        /**
+         * PARTICULAS ATMOSFERICAS EN CANVAS
+         */
+        const canvas = document.getElementById('dustCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 45; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.6 + 0.3,
+                vx: (Math.random() - 0.5) * 0.25,
+                vy: -Math.random() * 0.35 - 0.05,
+                alpha: Math.random() * 0.45 + 0.1
+            });
+        }
+
+        function animateDust() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.y < 0) p.y = canvas.height;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(220, 38, 38, ${p.alpha})`;
+                ctx.fill();
+            });
+            requestAnimationFrame(animateDust);
+        }
+
+        /**
+         * INTERACCION DEL BOTON PRINCIPAL
+         */
+        const startBtn = document.getElementById('startBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const transitionOverlay = document.getElementById('transitionOverlay');
+        const descendStatus = document.getElementById('descendStatus');
+        const resetDemoBtn = document.getElementById('resetDemoBtn');
+
+        startBtn.addEventListener('mouseenter', () => {
+            audioEngine.playHoverSound();
+        });
+
+        startBtn.addEventListener('click', () => {
+            audioEngine.playDescendSound();
+            startBtn.disabled = true;
+            startBtn.textContent = 'CONECTANDO...';
+
+            mainContainer.classList.add('diving');
+
+            setTimeout(() => {
+                transitionOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                transitionOverlay.classList.add('opacity-100');
+            }, 650);
+
+            setTimeout(() => {
+                descendStatus.textContent = 'ENLACE COMPLETADO — BIENVENIDO A SYNTRO';
+                descendStatus.classList.add('text-red-500');
+                resetDemoBtn.classList.remove('hidden');
+            }, 2200);
+        });
+
+        resetDemoBtn.addEventListener('click', () => {
+            transitionOverlay.classList.add('opacity-0', 'pointer-events-none');
+            transitionOverlay.classList.remove('opacity-100');
+            mainContainer.classList.remove('diving');
+            startBtn.disabled = false;
+            startBtn.textContent = 'INICIAR PROTOCOLO';
+            descendStatus.textContent = 'DESCENDIENDO AL NIVEL SUBTERRANEO';
+            descendStatus.classList.remove('text-red-500');
+            resetDemoBtn.classList.add('hidden');
+            runTerminalSequence();
+        });
+
+        window.onload = () => {
+            animateDust();
+            runTerminalSequence();
+        };
+    </script>
+</body>
+</html>

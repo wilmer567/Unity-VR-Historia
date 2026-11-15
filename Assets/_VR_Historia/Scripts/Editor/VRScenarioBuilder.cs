@@ -23,7 +23,8 @@ public class VRScenarioBuilder : EditorWindow
             "- HistoriaCapitulo2_Exploracion\n" +
             "- HistoriaCapitulo3_Revelacion\n" +
             "- SimulacionSyntro\n" +
-            "- MenuPrincipalVR\n\n" +
+            "- MenuPrincipalVR\n" +
+            "- IntroCinematica\n\n" +
             "Ademas creara ScriptableObjects y prefabs de ejemplo.\n\n" +
             "Continuar?", "Construir", "Cancelar"))
             return;
@@ -31,6 +32,7 @@ public class VRScenarioBuilder : EditorWindow
         EnsureDirectories();
         CrearScriptableObjects();
         CrearPrefabs();
+        ConstruirEscenaIntro();
         ConstruirEscenaMenu();
         ConstruirEscenaCapitulo1();
         ConstruirEscenaCapitulo2();
@@ -40,6 +42,9 @@ public class VRScenarioBuilder : EditorWindow
 
         EditorUtility.DisplayDialog("VR Historia", "Todos los escenarios han sido construidos.", "OK");
     }
+
+    [MenuItem("VR Historia/Construir Solo Intro Cinematica", priority = 9)]
+    public static void SoloConstruirIntro() { EnsureDirectories(); ConstruirEscenaIntro(); }
 
     [MenuItem("VR Historia/Construir Solo Menu VR", priority = 10)]
     public static void SoloConstruirMenu() { EnsureDirectories(); ConstruirEscenaMenu(); }
@@ -561,6 +566,30 @@ public class VRScenarioBuilder : EditorWindow
             PrefabUtility.SaveAsPrefabAsset(objItem, objPath);
             DestroyImmediate(objItem);
         }
+    }
+
+    // ===========================================
+    //  ESCENA: INTRO CINEMATICA
+    // ===========================================
+
+    static void ConstruirEscenaIntro()
+    {
+        var scene = CrearEscenaNueva("IntroCinematica");
+
+        // Cámara
+        var camObj = new GameObject("Main Camera");
+        camObj.tag = "MainCamera";
+        var cam = camObj.AddComponent<Camera>();
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = Color.black;
+        camObj.AddComponent<AudioListener>();
+
+        // Intro controller
+        var introObj = new GameObject("IntroCinematica");
+        introObj.AddComponent<VRIntroCinematica>();
+
+        EditorSceneManager.SaveScene(scene, SCENES_PATH + "IntroCinematica.unity");
+        Debug.Log("[VRScenarioBuilder] Escena IntroCinematica construida.");
     }
 
     // ===========================================
@@ -1119,6 +1148,7 @@ public class VRScenarioBuilder : EditorWindow
     {
         var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
         string[] nuevasEscenas = {
+            SCENES_PATH + "IntroCinematica.unity",
             SCENES_PATH + "MenuPrincipalVR.unity",
             SCENES_PATH + "HistoriaCapitulo1_Despertar.unity",
             SCENES_PATH + "HistoriaCapitulo2_Exploracion.unity",

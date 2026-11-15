@@ -21,6 +21,9 @@ public class SimulacionCompletaSyntro : MonoBehaviour
     public TextMeshProUGUI textoObjetivos;
     public TextMeshProUGUI textoInteraccion;
 
+    [Header("=== Audio Intro ===")]
+    public AudioClip latidoIntroClip;
+
     [Header("=== Puntos de Referencia ===")]
     public Transform spawnInicial;
     public Transform puntoServidorFinal;
@@ -93,9 +96,90 @@ public class SimulacionCompletaSyntro : MonoBehaviour
     IEnumerator IntroduccionFade()
     {
         movimientoBloqueado = true;
-        yield return new WaitForSeconds(1f);
-        yield return FadePantalla(1f, 0f, 2.5f);
+
+        if (panelFade != null) panelFade.alpha = 1f;
+
+        // Silencio tenso — 2 segundos en negro total
+        yield return new WaitForSeconds(2f);
+
+        // Latido cardíaco lejano
+        AudioSource latido = gameObject.AddComponent<AudioSource>();
+        latido.spatialBlend = 0f;
+        latido.volume = 0f;
+        latido.loop = true;
+        if (latidoIntroClip != null) { latido.clip = latidoIntroClip; latido.pitch = 0.6f; latido.Play(); }
+
+        // Fade del latido creciente durante la oscuridad
+        float t = 0f;
+        while (t < 3f)
+        {
+            t += Time.deltaTime;
+            float p = t / 3f;
+            latido.volume = Mathf.Lerp(0f, 0.35f, p);
+            latido.pitch = Mathf.Lerp(0.6f, 0.85f, p);
+            yield return null;
+        }
+
+        // Respiración agitada (texto)
+        MostrarMensajeHUD("...");
+        yield return new WaitForSeconds(1.5f);
+
+        // Primer parpadeo — abrir los ojos brevemente
+        yield return FadePantalla(1f, 0.7f, 0.3f);
+        yield return new WaitForSeconds(0.15f);
+        yield return FadePantalla(0.7f, 1f, 0.2f);
+        yield return new WaitForSeconds(0.8f);
+
+        // Segundo parpadeo — más largo
+        yield return FadePantalla(1f, 0.4f, 0.4f);
+        yield return new WaitForSeconds(0.3f);
+        yield return FadePantalla(0.4f, 0.9f, 0.3f);
+        yield return new WaitForSeconds(0.5f);
+
+        // Tercer parpadeo — los ojos se abren
+        yield return FadePantalla(0.9f, 0.15f, 0.6f);
+        yield return new WaitForSeconds(0.2f);
+        yield return FadePantalla(0.15f, 0.5f, 0.2f);
+        yield return new WaitForSeconds(0.3f);
+
+        // Ojos completamente abiertos
+        yield return FadePantalla(0.5f, 0f, 1.5f);
+
+        // Latido se calma
+        t = 0f;
+        while (t < 2f)
+        {
+            t += Time.deltaTime;
+            latido.volume = Mathf.Lerp(0.35f, 0.08f, t / 2f);
+            latido.pitch = Mathf.Lerp(0.85f, 0.7f, t / 2f);
+            yield return null;
+        }
+
+        MostrarMensajeHUD("¿Dónde... estoy?");
+        yield return new WaitForSeconds(3f);
+
+        // Activar el terror psicológico sutilmente
+        if (TerrorPsychologyManager.Instance != null)
+            TerrorPsychologyManager.Instance.PulsoTerror(0.08f, 2f);
+
         movimientoBloqueado = false;
+
+        // Eliminar el AudioSource temporal
+        StartCoroutine(FadeOutYDestruir(latido, 5f));
+    }
+
+    IEnumerator FadeOutYDestruir(AudioSource source, float duracion)
+    {
+        float volInicial = source.volume;
+        float t = 0f;
+        while (t < duracion)
+        {
+            t += Time.deltaTime;
+            source.volume = Mathf.Lerp(volInicial, 0f, t / duracion);
+            yield return null;
+        }
+        source.Stop();
+        Destroy(source);
     }
 
     // ==========================================
