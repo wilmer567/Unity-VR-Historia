@@ -231,6 +231,34 @@ public class SimulacionCompletaSyntro : MonoBehaviour
     {
         if (!simulacionActiva) return;
 
+        Keyboard kb = Keyboard.current;
+        if (kb != null)
+        {
+            // Cheat / Debug: F2 para ir al Segundo Piso / Gradas
+            if (kb.f2Key.wasPressedThisFrame)
+            {
+                Vector3 destinoPiso2 = new Vector3(8f, 4.2f, 2f);
+                TeletransportarJugador(destinoPiso2);
+                Debug.Log("[Syntro] Teletransporte de depuración al Segundo Piso / Gradas activado.");
+            }
+
+            // Cheat / Debug: F3 para saltar el bucle de gradas y subir al Piso 3
+            if (kb.f3Key.wasPressedThisFrame)
+            {
+                if (TrampaGradasSyntro.Instance != null)
+                {
+                    TrampaGradasSyntro.Instance.ForzarCompletarBucle();
+                    Debug.Log("[Syntro] Bucle de gradas forzado a completarse mediante F3.");
+                }
+                else
+                {
+                    Vector3 destinoPiso3 = new Vector3(0f, 8.3f, 7.5f);
+                    TeletransportarJugador(destinoPiso3);
+                    Debug.Log("[Syntro] Teletransporte directo al Piso 3 mediante F3.");
+                }
+            }
+        }
+
         ActualizarMovimiento();
         ActualizarZonas();
         ActualizarTriggerGradas();

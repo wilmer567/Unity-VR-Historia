@@ -326,7 +326,6 @@ public class MejorarSalaServidores : EditorWindow
         go.name = n; go.transform.SetParent(p);
         go.transform.localPosition = pos; go.transform.localScale = s;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         go.isStatic = true;
         Undo.RegisterCreatedObjectUndo(go, n);
         return go;
@@ -338,7 +337,6 @@ public class MejorarSalaServidores : EditorWindow
         go.name = n; go.transform.SetParent(p);
         go.transform.localPosition = pos; go.transform.localScale = s;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, n);
         return go;
     }

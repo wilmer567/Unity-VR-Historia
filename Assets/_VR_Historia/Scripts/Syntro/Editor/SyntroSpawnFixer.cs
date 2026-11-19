@@ -6,14 +6,15 @@ using TMPro;
 
 public class SyntroSpawnFixer : EditorWindow
 {
-    [MenuItem("SYNTRO/Corregir Pantalla Inicial y Luces Quemadas")]
+    [MenuItem("SYNTRO/Corregir Pantalla Inicial, Luces y Colliders")]
     public static void FixSpawnAndOverexposure()
     {
         FixBlindingLights();
         FixWallMaterials();
         UpgradeHUDContrast();
+        FixMissingColliders();
 
-        Debug.Log("<color=red><b>[SYNTRO]</b></color> Luces sobreexpuestas corregidas y contraste del HUD actualizado.");
+        Debug.Log("<color=red><b>[SYNTRO]</b></color> Luces, contraste y colliders corregidos en la escena.");
     }
 
     private static void FixBlindingLights()
@@ -37,8 +38,8 @@ public class SyntroSpawnFixer : EditorWindow
         }
 
         RenderSettings.skybox = null;
-        RenderSettings.ambientLight = new Color(0.03f, 0.03f, 0.04f);
-        RenderSettings.reflectionIntensity = 0.15f;
+        RenderSettings.ambientLight = new Color(0.25f, 0.25f, 0.3f);
+        RenderSettings.reflectionIntensity = 0.8f;
 
         Debug.Log($"[SYNTRO] Se regularon {fixedCount} luces que quemaban la escena.");
     }
@@ -77,6 +78,27 @@ public class SyntroSpawnFixer : EditorWindow
             tmp.outlineWidth = 0.22f;
             tmp.outlineColor = new Color32(0, 0, 0, 220);
         }
+    }
+
+    private static void FixMissingColliders()
+    {
+        MeshRenderer[] renderers = Object.FindObjectsByType<MeshRenderer>(FindObjectsSortMode.None);
+        int addedCount = 0;
+
+        foreach (MeshRenderer r in renderers)
+        {
+            if (r.gameObject.name.Contains("UI") || r.gameObject.name.Contains("Canvas") || r.gameObject.name.Contains("Particle") || r.gameObject.name.Contains("Volume") || r.gameObject.name.Contains("Atmosfera"))
+                continue;
+
+            Collider col = r.GetComponent<Collider>();
+            if (col == null)
+            {
+                r.gameObject.AddComponent<BoxCollider>();
+                addedCount++;
+            }
+        }
+
+        Debug.Log($"[SYNTRO] Se agregaron BoxColliders a {addedCount} objetos en la escena que no tenian colision.");
     }
 }
 #endif

@@ -497,7 +497,6 @@ public class ConectarPisosEdificio : EditorWindow
         go.transform.localPosition = pos;
         go.transform.localScale = escala;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, nombre);
         return go;
     }
@@ -512,7 +511,6 @@ public class ConectarPisosEdificio : EditorWindow
         go.transform.localScale = escala;
         go.transform.localRotation = rot;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, nombre);
     }
 

@@ -68,14 +68,14 @@ public class AtmosferaVisualTerrorSyntro
         perfil.components.Clear();
 
         var vignette = perfil.Add<Vignette>();
-        vignette.intensity.Override(0.45f);
+        vignette.intensity.Override(0.25f);
         vignette.smoothness.Override(0.35f);
-        vignette.color.Override(new Color(0.1f, 0f, 0f));
+        vignette.color.Override(new Color(0.05f, 0f, 0f));
 
         var color = perfil.Add<ColorAdjustments>();
-        color.postExposure.Override(-0.5f);
+        color.postExposure.Override(0.4f);
         color.contrast.Override(15f);
-        color.saturation.Override(-30f);
+        color.saturation.Override(-10f);
 
         var grain = perfil.Add<FilmGrain>();
         grain.intensity.Override(0.35f);
@@ -106,13 +106,13 @@ public class AtmosferaVisualTerrorSyntro
     {
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.ExponentialSquared;
-        RenderSettings.fogDensity = 0.025f;
-        RenderSettings.fogColor = new Color(0.02f, 0.02f, 0.04f);
-        RenderSettings.ambientLight = new Color(0.03f, 0.03f, 0.05f);
+        RenderSettings.fogDensity = 0.01f;
+        RenderSettings.fogColor = new Color(0.15f, 0.15f, 0.2f);
+        RenderSettings.ambientLight = new Color(0.25f, 0.25f, 0.3f);
         RenderSettings.ambientMode = AmbientMode.Flat;
 
         EditorSceneManager_MarkDirty();
-        Debug.Log("[AtmosferaTerror] Niebla exponencial y luz ambiente oscura configuradas.");
+        Debug.Log("[AtmosferaTerror] Niebla suave y luz ambiente iluminada configuradas.");
     }
 
     static void EditorSceneManager_MarkDirty()

@@ -575,12 +575,12 @@ public class ConfiguradorGraficosRealistas : EditorWindow
     {
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Exponential;
-        RenderSettings.fogColor = new Color(0.01f, 0.015f, 0.04f);
-        RenderSettings.fogDensity = 0.045f;
+        RenderSettings.fogColor = new Color(0.15f, 0.15f, 0.2f);
+        RenderSettings.fogDensity = 0.015f;
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.02f, 0.02f, 0.035f);
+        RenderSettings.ambientLight = new Color(0.25f, 0.25f, 0.3f);
 
-        Debug.Log("[ConfigGraficos] Niebla exponencial oscura activada");
+        Debug.Log("[ConfigGraficos] Niebla suave e iluminación ambiente activadas");
     }
 
     // =====================================================
@@ -618,7 +618,7 @@ public class ConfiguradorGraficosRealistas : EditorWindow
 
         // --- Vignette ---
         Vignette vignette = profile.Add<Vignette>(true);
-        vignette.intensity.Override(0.45f);
+        vignette.intensity.Override(0.25f);
         vignette.smoothness.Override(0.35f);
         vignette.color.Override(new Color(0f, 0f, 0.02f));
 
@@ -626,12 +626,12 @@ public class ConfiguradorGraficosRealistas : EditorWindow
         Tonemapping tonemapping = profile.Add<Tonemapping>(true);
         tonemapping.mode.Override(TonemappingMode.ACES);
 
-        // --- Color Adjustments: alto contraste frio ---
+        // --- Color Adjustments: alto contraste frio y mayor iluminación ---
         ColorAdjustments colorAdj = profile.Add<ColorAdjustments>(true);
-        colorAdj.postExposure.Override(0.3f);
-        colorAdj.contrast.Override(30f);
-        colorAdj.saturation.Override(-10f);
-        colorAdj.colorFilter.Override(new Color(0.85f, 0.9f, 1.0f));
+        colorAdj.postExposure.Override(0.8f);
+        colorAdj.contrast.Override(20f);
+        colorAdj.saturation.Override(-5f);
+        colorAdj.colorFilter.Override(new Color(0.9f, 0.95f, 1.0f));
 
         // --- Film Grain sutil ---
         FilmGrain filmGrain = profile.Add<FilmGrain>(true);

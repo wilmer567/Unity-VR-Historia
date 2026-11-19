@@ -17,17 +17,17 @@ public class PostProcessingConfigurator : MonoBehaviour
     [SerializeField] private float bloomScatter = 0.7f;
 
     [Header("=== Vignette Base ===")]
-    [SerializeField] private float vignetteIntensity = 0.35f;
+    [SerializeField] private float vignetteIntensity = 0.45f;
     [SerializeField] private float vignetteSmoothness = 0.3f;
 
     [Header("=== Color Adjustments ===")]
-    [SerializeField] private float postExposure = 0.1f;
+    [SerializeField] private float postExposure = 0.5f;
     [SerializeField] private float contrast = 15f;
     [SerializeField] private float saturation = -10f;
     [SerializeField] private Color colorFilter = new Color(0.9f, 0.92f, 1f);
 
     [Header("=== Film Grain ===")]
-    [SerializeField] private float filmGrainIntensity = 0.15f;
+    [SerializeField] private float filmGrainIntensity = 0.35f;
 
     [Header("=== Chromatic Aberration ===")]
     [SerializeField] private float chromaticIntensity = 0.08f;

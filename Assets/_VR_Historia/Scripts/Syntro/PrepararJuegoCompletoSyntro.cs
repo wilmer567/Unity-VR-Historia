@@ -197,7 +197,6 @@ public class PrepararJuegoCompletoSyntro
         cabeza.transform.SetParent(silueta.transform);
         cabeza.transform.localPosition = new Vector3(0f, 0.8f, 0f);
         cabeza.transform.localScale = new Vector3(0.25f, 0.3f, 0.25f);
-        Object.DestroyImmediate(cabeza.GetComponent<Collider>());
         cabeza.GetComponent<Renderer>().sharedMaterial = matSilueta;
 
         silueta.SetActive(false);
@@ -571,7 +570,6 @@ public class PrepararJuegoCompletoSyntro
         cubo.transform.SetParent(padre);
         cubo.transform.localPosition = posLocal;
         cubo.transform.localScale = tamano;
-        Object.DestroyImmediate(cubo.GetComponent<Collider>());
         if (mat != null)
             cubo.GetComponent<Renderer>().sharedMaterial = mat;
         return cubo;

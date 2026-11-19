@@ -141,7 +141,7 @@ public class EdificioSyntro : EditorWindow
         go.isStatic = true;
         go.GetComponent<Renderer>().sharedMaterial = mat;
         var col = go.GetComponent<Collider>();
-        if (col != null) Object.DestroyImmediate(col);
+        if (col != null) col.isTrigger = false;
         Undo.RegisterCreatedObjectUndo(go, nombre);
         return go;
     }
@@ -231,16 +231,23 @@ public class EdificioSyntro : EditorWindow
 
         GameObject pasillo1 = Contenedor("Pasillo_P1_Principal", piso1.transform,
             new Vector3(0f, 0f, pasilloZ - anchoPasillo / 2f));
+        pasillo1.AddComponent<CuadrosFlotantesPasillo>();
 
         // Piso del pasillo
         Cubo("Piso_Pasillo_P1", pasillo1.transform,
             new Vector3(0f, -0.05f, 0f),
             new Vector3(largoPasillo, 0.1f, anchoPasillo), matPiso);
 
-        // Techo del pasillo
-        Cubo("Techo_Pasillo_P1", pasillo1.transform,
-            new Vector3(0f, altoPared + 0.05f, 0f),
-            new Vector3(largoPasillo, 0.1f, anchoPasillo), matTecho);
+        // Techo del pasillo (dividido para dejar hueco en la caja de escaleras X=[6.5, 9.5])
+        float tp1IzqAncho = 6.5f + largoPasillo / 2f;
+        float tp1IzqX = (-largoPasillo / 2f + 6.5f) / 2f;
+        float tp1DerAncho = largoPasillo / 2f - 9.5f;
+        float tp1DerX = (9.5f + largoPasillo / 2f) / 2f;
+        Cubo("Techo_Pasillo_P1_Izq", pasillo1.transform,
+            new Vector3(tp1IzqX, altoPared + 0.05f, 0f), new Vector3(tp1IzqAncho, 0.1f, anchoPasillo), matTecho);
+        if (tp1DerAncho > 0.1f)
+            Cubo("Techo_Pasillo_P1_Der", pasillo1.transform,
+                new Vector3(tp1DerX, altoPared + 0.05f, 0f), new Vector3(tp1DerAncho, 0.1f, anchoPasillo), matTecho);
 
         // Pared sur del pasillo (la lejana)
         Cubo("Pared_Sur_P1", pasillo1.transform,
@@ -380,16 +387,36 @@ public class EdificioSyntro : EditorWindow
         GameObject ala = Contenedor(nombre, piso1.transform, Vector3.zero);
 
         // Pasillo del ala (eje Z)
-        Cubo("Piso_Ala", ala.transform,
-            new Vector3(xBase + dir * anchoPasillo / 2f, -0.05f, -4f + largoAla / 2f),
-            new Vector3(anchoPasillo, 0.1f, largoAla), matPiso);
-        Cubo("Techo_Ala", ala.transform,
-            new Vector3(xBase + dir * anchoPasillo / 2f, altoPared + 0.05f, -4f + largoAla / 2f),
-            new Vector3(anchoPasillo, 0.1f, largoAla), matTecho);
+        float centroAlaX = xBase + dir * anchoPasillo / 2f;
+        float bordeDerAla = centroAlaX + anchoPasillo / 2f;
 
-        // Pared exterior del ala
+        Cubo("Piso_Ala", ala.transform,
+            new Vector3(centroAlaX, -0.05f, -4f + largoAla / 2f),
+            new Vector3(anchoPasillo, 0.1f, largoAla), matPiso);
+
+        // Recortar techo y piso del ala si se solapan con la caja de escaleras (X > 6.5)
+        float limiteEscalera = 6.5f;
+        if (bordeDerAla > limiteEscalera && derecha)
+        {
+            float anchoRecortado = limiteEscalera - (centroAlaX - anchoPasillo / 2f);
+            float centroRecortado = (centroAlaX - anchoPasillo / 2f + limiteEscalera) / 2f;
+            Cubo("Techo_Ala", ala.transform,
+                new Vector3(centroRecortado, altoPared + 0.05f, -4f + largoAla / 2f),
+                new Vector3(anchoRecortado, 0.1f, largoAla), matTecho);
+        }
+        else
+        {
+            Cubo("Techo_Ala", ala.transform,
+                new Vector3(centroAlaX, altoPared + 0.05f, -4f + largoAla / 2f),
+                new Vector3(anchoPasillo, 0.1f, largoAla), matTecho);
+        }
+
+        // Pared exterior del ala (recortada si invade la caja de escaleras)
+        float paredExtX = xBase + dir * anchoPasillo;
+        if (paredExtX > limiteEscalera && derecha)
+            paredExtX = limiteEscalera;
         Cubo("ParedExt_Ala", ala.transform,
-            new Vector3(xBase + dir * anchoPasillo, altoPared / 2f, -4f + largoAla / 2f),
+            new Vector3(paredExtX, altoPared / 2f, -4f + largoAla / 2f),
             new Vector3(0.15f, altoPared, largoAla), matParedExterior);
 
         // Pared interior (contra edificio existente)
@@ -654,67 +681,172 @@ public class EdificioSyntro : EditorWindow
     {
         float yBase = 4f;
         float alto = 3.5f;
-        float anchoPas = 2.4f;
-        float largoPas = 18f;
+        float anchoPas = 3.0f;
+        float largoPas = 28f;
 
-        GameObject piso2 = Contenedor("Piso2_Edificio", edificio, new Vector3(0f, yBase, 6f));
-        GameObject pasillo = Contenedor("Pasillo_P2", piso2.transform, Vector3.zero);
+        GameObject piso2 = Contenedor("Piso2_Edificio_Ampliado", edificio, new Vector3(0f, yBase, 6f));
+        GameObject pasillo = Contenedor("Pasillo_Principal_P2", piso2.transform, Vector3.zero);
 
-        // Piso y techo
+        // Piso y techo principal (techo dividido para dejar hueco en la caja de escaleras)
         Cubo("Piso_P2", pasillo.transform,
             new Vector3(0f, -0.05f, 0f), new Vector3(largoPas, 0.1f, anchoPas), matPiso);
-        Cubo("Techo_P2", pasillo.transform,
-            new Vector3(0f, alto + 0.05f, 0f), new Vector3(largoPas, 0.1f, anchoPas), matTecho);
 
-        // Paredes norte y sur
-        Cubo("Pared_N_P2", pasillo.transform,
-            new Vector3(0f, alto / 2f, anchoPas / 2f), new Vector3(largoPas, alto, 0.15f), matParedInterior);
-        Cubo("Pared_S_P2", pasillo.transform,
-            new Vector3(0f, alto / 2f, -anchoPas / 2f), new Vector3(largoPas, alto, 0.15f), matParedInterior);
+        // Techo P2: la caja de gradas está en global X=8, pero piso2 tiene offset (0,4,6)
+        // → en coordenadas locales del pasillo la escalera está en X=8, Z entre -2 y 2
+        // Dividimos el techo en dos tramos dejando hueco en X=[6.5, 9.5] local
+        float techoIzqAncho = 6.5f + largoPas / 2f;
+        float techoIzqX = (-largoPas / 2f + 6.5f) / 2f;
+        float techoDerAncho = largoPas / 2f - 9.5f;
+        float techoDerX = (9.5f + largoPas / 2f) / 2f;
+        Cubo("Techo_P2_Izq", pasillo.transform,
+            new Vector3(techoIzqX, alto + 0.05f, 0f), new Vector3(techoIzqAncho, 0.1f, anchoPas), matTecho);
+        Cubo("Techo_P2_Der", pasillo.transform,
+            new Vector3(techoDerX, alto + 0.05f, 0f), new Vector3(techoDerAncho, 0.1f, anchoPas), matTecho);
 
-        // Cierres laterales (con hueco en el lado este para gradas)
+        // Cierres laterales
         Cubo("Cierre_O_P2", pasillo.transform,
             new Vector3(-largoPas / 2f, alto / 2f, 0f), new Vector3(0.15f, alto, anchoPas), matParedInterior);
+        Cubo("Cierre_E_P2", pasillo.transform,
+            new Vector3(largoPas / 2f, alto / 2f, 0f), new Vector3(0.15f, alto, anchoPas), matParedInterior);
 
-        // Puertas oficinas lado norte
-        string[] oficinas = { "Oficina_201", "Oficina_202", "Archivo", "Reunion", "Oficina_203", "Bano_P2" };
-        for (int i = 0; i < oficinas.Length; i++)
+        // Generar múltiples cuartos ingresables a ambos lados (Norte y Sur)
+        string[] cuartosNorte = { "Oficina_201", "Oficina_202", "Archivo_Central", "Sala_Juntas", "Oficina_203", "Laboratorio_B", "Servicios_P2" };
+        string[] cuartosSur = { "Almacen_Norte", "Oficina_204", "Sala_Monitoreo", "Biblioteca_Oculta", "Oficina_205", "Bano_Personal", "Zona_Descanso" };
+
+        float profundidadCuarto = 5f;
+
+        // Cuartos lado Norte (Z positivo)
+        // Saltar cuartos que se solapan con la zona de escaleras (X=5..11)
+        for (int i = 0; i < cuartosNorte.Length; i++)
         {
-            float x = -6f + i * 2.4f;
-            Cubo("Puerta_" + oficinas[i], pasillo.transform,
-                new Vector3(x, 1.1f, anchoPas / 2f - 0.06f),
-                new Vector3(0.9f, 2.2f, 0.06f), matPuertaMetal);
-            Cubo("Marco_L_" + oficinas[i], pasillo.transform,
-                new Vector3(x - 0.5f, 1.1f, anchoPas / 2f - 0.04f),
-                new Vector3(0.06f, 2.3f, 0.08f), matMarcoPuerta);
-            Cubo("Marco_R_" + oficinas[i], pasillo.transform,
-                new Vector3(x + 0.5f, 1.1f, anchoPas / 2f - 0.04f),
-                new Vector3(0.06f, 2.3f, 0.08f), matMarcoPuerta);
+            float xPos = -10f + (i * 3.4f);
+            if (xPos > 5.0f && xPos < 11.0f) continue;
+            GameObject cuarto = Contenedor($"Cuarto_Norte_{cuartosNorte[i]}", piso2.transform, new Vector3(xPos, 0f, anchoPas / 2f + profundidadCuarto / 2f));
+
+            // Suelo y techo del cuarto
+            Cubo("Piso", cuarto.transform, new Vector3(0f, -0.05f, 0f), new Vector3(3.2f, 0.1f, profundidadCuarto), matPiso);
+            Cubo("Techo", cuarto.transform, new Vector3(0f, alto + 0.05f, 0f), new Vector3(3.2f, 0.1f, profundidadCuarto), matTecho);
+
+            // Paredes laterales del cuarto
+            Cubo("Pared_Izq", cuarto.transform, new Vector3(-1.6f, alto / 2f, 0f), new Vector3(0.15f, alto, profundidadCuarto), matParedInterior);
+            Cubo("Pared_Der", cuarto.transform, new Vector3(1.6f, alto / 2f, 0f), new Vector3(0.15f, alto, profundidadCuarto), matParedInterior);
+            // Pared al fondo
+            Cubo("Pared_Fondo", cuarto.transform, new Vector3(0f, alto / 2f, profundidadCuarto / 2f), new Vector3(3.2f, alto, 0.15f), matParedInterior);
+
+            // Pared frontal con puerta abierta (hueco de entrada)
+            Cubo("Pared_Frontal_Izq", cuarto.transform, new Vector3(-1.15f, alto / 2f, -profundidadCuarto / 2f), new Vector3(0.9f, alto, 0.15f), matParedInterior);
+            Cubo("Pared_Frontal_Der", cuarto.transform, new Vector3(1.15f, alto / 2f, -profundidadCuarto / 2f), new Vector3(0.9f, alto, 0.15f), matParedInterior);
+            Cubo("Dintel_Puerta", cuarto.transform, new Vector3(0f, 2.3f, -profundidadCuarto / 2f), new Vector3(1.4f, alto - 2.3f, 0.15f), matParedInterior);
+
+            // Luz interior en cada cuarto
+            GameObject luzCuarto = new GameObject($"Luz_{cuartosNorte[i]}");
+            luzCuarto.transform.SetParent(cuarto.transform);
+            luzCuarto.transform.localPosition = new Vector3(0f, alto - 0.5f, 0f);
+            Light l = luzCuarto.AddComponent<Light>();
+            l.type = LightType.Point; l.range = 4.5f; l.intensity = 0.8f;
+            l.color = new Color(0.85f, 0.8f, 0.7f);
+            Undo.RegisterCreatedObjectUndo(luzCuarto, "Luz cuarto norte");
         }
 
-        // Luces
-        for (int i = -3; i <= 3; i++)
+        // Cuartos lado Sur (Z negativo)
+        // Saltar cuartos que se solapan con el corredor de conexión a escaleras (X=6.5..9.5)
+        for (int i = 0; i < cuartosSur.Length; i++)
         {
-            CrearLuzPasillo(pasillo.transform, new Vector3(i * 2.5f, alto - 0.02f, 0f));
+            float xPos = -10f + (i * 3.4f);
+            if (xPos > 5.0f && xPos < 11.0f) continue;
+            GameObject cuarto = Contenedor($"Cuarto_Sur_{cuartosSur[i]}", piso2.transform, new Vector3(xPos, 0f, -anchoPas / 2f - profundidadCuarto / 2f));
+
+            // Suelo y techo del cuarto
+            Cubo("Piso", cuarto.transform, new Vector3(0f, -0.05f, 0f), new Vector3(3.2f, 0.1f, profundidadCuarto), matPiso);
+            Cubo("Techo", cuarto.transform, new Vector3(0f, alto + 0.05f, 0f), new Vector3(3.2f, 0.1f, profundidadCuarto), matTecho);
+
+            // Paredes laterales del cuarto
+            Cubo("Pared_Izq", cuarto.transform, new Vector3(-1.6f, alto / 2f, 0f), new Vector3(0.15f, alto, profundidadCuarto), matParedInterior);
+            Cubo("Pared_Der", cuarto.transform, new Vector3(1.6f, alto / 2f, 0f), new Vector3(0.15f, alto, profundidadCuarto), matParedInterior);
+            // Pared al fondo
+            Cubo("Pared_Fondo", cuarto.transform, new Vector3(0f, alto / 2f, -profundidadCuarto / 2f), new Vector3(3.2f, alto, 0.15f), matParedInterior);
+
+            // Pared frontal con puerta abierta
+            Cubo("Pared_Frontal_Izq", cuarto.transform, new Vector3(-1.15f, alto / 2f, profundidadCuarto / 2f), new Vector3(0.9f, alto, 0.15f), matParedInterior);
+            Cubo("Pared_Frontal_Der", cuarto.transform, new Vector3(1.15f, alto / 2f, profundidadCuarto / 2f), new Vector3(0.9f, alto, 0.15f), matParedInterior);
+            Cubo("Dintel_Puerta", cuarto.transform, new Vector3(0f, 2.3f, profundidadCuarto / 2f), new Vector3(1.4f, alto - 2.3f, 0.15f), matParedInterior);
+
+            // Luz interior en cada cuarto
+            GameObject luzCuarto = new GameObject($"Luz_{cuartosSur[i]}");
+            luzCuarto.transform.SetParent(cuarto.transform);
+            luzCuarto.transform.localPosition = new Vector3(0f, alto - 0.5f, 0f);
+            Light l = luzCuarto.AddComponent<Light>();
+            l.type = LightType.Point; l.range = 4.5f; l.intensity = 0.8f;
+            l.color = new Color(0.85f, 0.8f, 0.7f);
+            Undo.RegisterCreatedObjectUndo(luzCuarto, "Luz cuarto sur");
         }
 
-        // Habitaciones sugeridas detras de pared sur
-        Cubo("ParedExt_Sur_P2", piso2.transform,
-            new Vector3(0f, alto / 2f, -anchoPas / 2f - 4f),
-            new Vector3(largoPas + 1f, alto, 0.2f), matParedExterior);
-        Cubo("Piso_Hab_P2", piso2.transform,
-            new Vector3(0f, -0.05f, -anchoPas / 2f - 2f),
-            new Vector3(largoPas + 1f, 0.1f, 4f), matPiso);
+        // Luces en el pasillo principal ampliado
+        for (int i = -4; i <= 4; i++)
+        {
+            CrearLuzPasillo(pasillo.transform, new Vector3(i * 3f, alto - 0.02f, 0f));
+        }
 
-        // Zocalos
-        Cubo("Zocalo_N_P2", pasillo.transform,
-            new Vector3(0f, 0.06f, anchoPas / 2f - 0.02f),
-            new Vector3(largoPas, 0.12f, 0.03f), matZocalo);
-        Cubo("Zocalo_S_P2", pasillo.transform,
-            new Vector3(0f, 0.06f, -anchoPas / 2f + 0.02f),
-            new Vector3(largoPas, 0.12f, 0.03f), matZocalo);
+        // === CORREDOR DE CONEXIÓN: escalera → pasillo P2 ===
+        // La escalera P1→P2 deja al jugador en global (8, 4, -4).
+        // El pasillo P2 está en global Z=6. Conectamos con un corredor en eje Z.
+        ConectarEscaleraConPiso2(piso2.transform, alto);
 
-        Debug.Log("[Edificio] Piso 2 construido: pasillo + 6 oficinas");
+        Debug.Log("[Edificio] Piso 2 ampliado construido: pasillo principal de 28m + 14 cuartos + corredor de conexion a escaleras.");
+    }
+
+    static void ConectarEscaleraConPiso2(Transform piso2, float alto)
+    {
+        // Coordenadas locales respecto a piso2 (que está en global (0, 4, 6)):
+        // Escalera llega a global (8, 4, -4) → local (8, 0, -10)
+        // Pasillo P2 está en local Z=0 (borde sur a Z = -anchoPas/2 = -1.5)
+        // Corredor abierto en ambos extremos: solo piso, techo, paredes laterales y luces
+
+        GameObject corredor = Contenedor("Corredor_Conexion_Escalera_P2", piso2, Vector3.zero);
+
+        float corridorStartZ = -10.5f;
+        float corridorEndZ = -1.5f;
+        float corridorLength = corridorEndZ - corridorStartZ;
+        float corridorCenterZ = (corridorStartZ + corridorEndZ) / 2f;
+        float corridorX = 8f;
+        float corridorWidth = 2.8f;
+
+        // Piso del corredor
+        Cubo("Piso_Corredor_P2", corredor.transform,
+            new Vector3(corridorX, -0.05f, corridorCenterZ),
+            new Vector3(corridorWidth, 0.1f, corridorLength), matPiso);
+
+        // Techo del corredor
+        Cubo("Techo_Corredor_P2", corredor.transform,
+            new Vector3(corridorX, alto + 0.05f, corridorCenterZ),
+            new Vector3(corridorWidth, 0.1f, corridorLength), matTecho);
+
+        // Pared izquierda (oeste) — solo guía visual, sin cerrar los extremos
+        Cubo("Pared_O_Corredor_P2", corredor.transform,
+            new Vector3(corridorX - corridorWidth / 2f, alto / 2f, corridorCenterZ),
+            new Vector3(0.15f, alto, corridorLength), matParedInterior);
+
+        // Pared derecha (este)
+        Cubo("Pared_E_Corredor_P2", corredor.transform,
+            new Vector3(corridorX + corridorWidth / 2f, alto / 2f, corridorCenterZ),
+            new Vector3(0.15f, alto, corridorLength), matParedInterior);
+
+        // SIN paredes en extremo sur (abierto hacia escalera) ni norte (abierto hacia pasillo)
+
+        // Zócalos
+        Cubo("Zocalo_O_Corredor", corredor.transform,
+            new Vector3(corridorX - corridorWidth / 2f + 0.02f, 0.06f, corridorCenterZ),
+            new Vector3(0.03f, 0.12f, corridorLength), matZocalo);
+        Cubo("Zocalo_E_Corredor", corredor.transform,
+            new Vector3(corridorX + corridorWidth / 2f - 0.02f, 0.06f, corridorCenterZ),
+            new Vector3(0.03f, 0.12f, corridorLength), matZocalo);
+
+        // Luces del corredor de conexión
+        for (int i = 0; i < 4; i++)
+        {
+            float z = corridorStartZ + 1.5f + i * (corridorLength / 4f);
+            CrearLuzPasillo(corredor.transform, new Vector3(corridorX, alto - 0.02f, z));
+        }
     }
 
     // =====================================================
@@ -794,21 +926,26 @@ public class EdificioSyntro : EditorWindow
         float profPorEsc = 0.2f;
         float anchoEsc = 2.2f;
 
+        float totalZ = numEscalones * profPorEsc;
+        float largo = Mathf.Sqrt(totalZ * totalZ + alturaTotal * alturaTotal);
+        float angulo = Mathf.Atan2(alturaTotal, totalZ) * Mathf.Rad2Deg * dirZ;
+
         for (int i = 0; i < numEscalones; i++)
         {
             float y = i * alturaPorEsc;
             float z = i * profPorEsc * dirZ;
 
-            // Escalon visible
+            // Escalon visible — conserva collider (superficie horizontal donde pisa el jugador)
             GameObject esc = Cubo($"Esc_{i}", tramo.transform,
                 new Vector3(0f, y + alturaPorEsc / 2f, z),
                 new Vector3(anchoEsc, alturaPorEsc, profPorEsc), matEscalon);
             esc.isStatic = true;
 
-            // Contrahuella (parte vertical frontal del escalon)
-            Cubo($"CH_{i}", tramo.transform,
+            // Contrahuella — sin collider (la cara vertical bloqueaba el movimiento)
+            GameObject ch = Cubo($"CH_{i}", tramo.transform,
                 new Vector3(0f, y, z - profPorEsc / 2f * dirZ),
                 new Vector3(anchoEsc, alturaPorEsc, 0.02f), matParedInterior);
+            Object.DestroyImmediate(ch.GetComponent<Collider>());
 
             // Balaustres cada 4 escalones
             if (i % 4 == 0)
@@ -822,11 +959,20 @@ public class EdificioSyntro : EditorWindow
             }
         }
 
-        // Pasamanos (barra superior inclinada)
-        float totalZ = numEscalones * profPorEsc;
-        float largo = Mathf.Sqrt(totalZ * totalZ + alturaTotal * alturaTotal);
-        float angulo = Mathf.Atan2(alturaTotal, totalZ) * Mathf.Rad2Deg * dirZ;
+        // --- RAMPA INVISIBLE PARA COLISION SUAVE (Fix para CharacterController) ---
+        GameObject rampa = Cubo("Colision_Rampa_Suave", tramo.transform,
+            new Vector3(0f, alturaTotal / 2f, (totalZ / 2f - profPorEsc / 2f) * dirZ),
+            new Vector3(anchoEsc + 0.1f, 0.1f, largo + 0.2f), null);
+        
+        // La rotación debe ser la misma que el pasamanos
+        rampa.transform.localRotation = Quaternion.Euler(angulo, 0f, 0f);
+        
+        // Quitamos el renderer para que sea invisible, pero mantenemos el collider
+        Object.DestroyImmediate(rampa.GetComponent<Renderer>());
+        // Aseguramos que no sea trigger
+        rampa.GetComponent<Collider>().isTrigger = false;
 
+        // Pasamanos (barra superior inclinada)
         GameObject pmL = Cubo("Pasamanos_L", tramo.transform,
             new Vector3(-anchoEsc / 2f - 0.04f, alturaTotal / 2f + 0.55f, totalZ * dirZ / 2f),
             new Vector3(0.06f, 0.04f, largo), matBarandal);
@@ -836,15 +982,6 @@ public class EdificioSyntro : EditorWindow
             new Vector3(anchoEsc / 2f + 0.04f, alturaTotal / 2f + 0.55f, totalZ * dirZ / 2f),
             new Vector3(0.06f, 0.04f, largo), matBarandal);
         pmR.transform.localRotation = Quaternion.Euler(angulo, 0f, 0f);
-
-        // Rampa collider invisible para caminar
-        GameObject ramp = new GameObject("RampCollider");
-        ramp.transform.SetParent(tramo.transform);
-        ramp.transform.localPosition = new Vector3(0f, alturaTotal / 2f, totalZ * dirZ / 2f);
-        ramp.transform.localRotation = Quaternion.Euler(angulo, 0f, 0f);
-        BoxCollider col = ramp.AddComponent<BoxCollider>();
-        col.size = new Vector3(anchoEsc, 0.05f, largo);
-        Undo.RegisterCreatedObjectUndo(ramp, "Ramp");
 
         // Descanso al final del tramo
         Cubo("Descanso_" + nombre, tramo.transform,
@@ -893,16 +1030,27 @@ public class EdificioSyntro : EditorWindow
             new Vector3(-largoEdificio / 2f, altoPiso / 2f, -3f),
             new Vector3(0.25f, altoPiso, anchoEdificio), matParedExterior);
 
-        // === ENTREPISOS ===
-        Cubo("Losa_SotP1", exterior.transform,
-            new Vector3(0f, 0f, -3f),
-            new Vector3(largoEdificio, 0.2f, anchoEdificio), matParedExterior);
-        Cubo("Losa_P1P2", exterior.transform,
-            new Vector3(0f, altoPiso, -3f),
-            new Vector3(largoEdificio, 0.2f, anchoEdificio), matParedExterior);
-        Cubo("Losa_P2P3", exterior.transform,
-            new Vector3(0f, 8f, -3f),
-            new Vector3(largoEdificio, 0.2f, anchoEdificio), matParedExterior);
+        // === ENTREPISOS (con hueco para la caja de escaleras en X=6.5..9.5) ===
+        float huecoXMin = 6.5f;
+        float huecoXMax = 9.5f;
+        float halfLargo = largoEdificio / 2f;
+
+        float anchoIzq = huecoXMin + halfLargo;
+        float centroIzqX = (-halfLargo + huecoXMin) / 2f;
+        float anchoDer = halfLargo - huecoXMax;
+        float centroDerX = (huecoXMax + halfLargo) / 2f;
+
+        float[] losasY = { 0f, altoPiso, 8f };
+        string[] losasNombre = { "SotP1", "P1P2", "P2P3" };
+        for (int li = 0; li < 3; li++)
+        {
+            Cubo($"Losa_{losasNombre[li]}_Izq", exterior.transform,
+                new Vector3(centroIzqX, losasY[li], -3f),
+                new Vector3(anchoIzq, 0.2f, anchoEdificio), matParedExterior);
+            Cubo($"Losa_{losasNombre[li]}_Der", exterior.transform,
+                new Vector3(centroDerX, losasY[li], -3f),
+                new Vector3(anchoDer, 0.2f, anchoEdificio), matParedExterior);
+        }
 
         // === PISO 3: Muros exteriores ===
         float y3 = 8f;

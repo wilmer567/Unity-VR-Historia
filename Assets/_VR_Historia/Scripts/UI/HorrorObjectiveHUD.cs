@@ -18,12 +18,12 @@ public class HorrorObjectiveHUD : MonoBehaviour
     public TextMeshProUGUI objectivesListText;
 
     [Header("Configuracion de Escena")]
-    public string sectorName = "SUBSUELO 01 // SALA DE MAQUINAS";
+    public string sectorName = "SUBSUELO 01 // CORREDOR DE CONTENCIÓN";
     public List<ObjectiveItem> objectives = new List<ObjectiveItem>()
     {
-        new ObjectiveItem { id = "find_rack", description = "Encuentra el servidor que esta fallando" },
-        new ObjectiveItem { id = "read_error", description = "Revisa el registro de anomalias en la terminal" },
-        new ObjectiveItem { id = "reboot_rack", description = "Fuerza el reinicio antes de que caiga la energia" }
+        new ObjectiveItem { id = "find_rack", description = "Localiza la sala de servidores con brecha de energía" },
+        new ObjectiveItem { id = "read_error", description = "Revisa el registro de anomalías en la terminal" },
+        new ObjectiveItem { id = "reboot_rack", description = "Fuerza el reinicio antes del apagón total" }
     };
 
     [Header("Colores HUD")]

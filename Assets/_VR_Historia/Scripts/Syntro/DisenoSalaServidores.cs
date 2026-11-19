@@ -148,7 +148,6 @@ public class DisenoSalaServidores : EditorWindow
         go.transform.localPosition = pos;
         go.transform.localScale = escala;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, "Crear " + nombre);
         return go;
     }
@@ -161,7 +160,6 @@ public class DisenoSalaServidores : EditorWindow
         go.transform.localPosition = pos;
         go.transform.localScale = escala;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, "Crear " + nombre);
         return go;
     }
@@ -183,7 +181,6 @@ public class DisenoSalaServidores : EditorWindow
         go.transform.localPosition = pos;
         go.transform.localScale = escala;
         go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, "Crear " + nombre);
         return go;
     }

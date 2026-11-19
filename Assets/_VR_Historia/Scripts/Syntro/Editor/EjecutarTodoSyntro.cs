@@ -6,13 +6,8 @@ using System.IO;
 [InitializeOnLoad]
 public class EjecutarTodoSyntro
 {
-    private static readonly string TRIGGER = Path.Combine(Application.dataPath, "..", "Temp", "Syntro_EJECUTAR_TODO.trigger");
-
     static EjecutarTodoSyntro()
     {
-        if (!File.Exists(TRIGGER)) return;
-
-        File.Delete(TRIGGER);
         EditorApplication.delayCall += EjecutarSecuencia;
     }
 
@@ -90,36 +85,35 @@ public class EjecutarTodoSyntro
 
         try
         {
-            Debug.Log("[Syntro] >>> PASO 7/7: Construyendo Laboratorio Piso 3 Terror...");
+            Debug.Log("[Syntro] >>> PASO 7/8: Construyendo Laboratorio Piso 3 Terror...");
             LaboratorioPiso3Terror.Ejecutar();
-            Debug.Log("[Syntro] >>> PASO 7/7 COMPLETADO");
+            Debug.Log("[Syntro] >>> PASO 7/8 COMPLETADO");
         }
         catch (System.Exception e)
         {
             Debug.LogError("[Syntro] Error en Paso 7 (Lab Piso 3): " + e.Message + "\n" + e.StackTrace);
         }
 
+        try
+        {
+            Debug.Log("[Syntro] >>> PASO 8/8: Mejorando corredor, HUD e iluminación terror...");
+            SyntroCorredorEnhancer.MejorarCorredor();
+            Debug.Log("[Syntro] >>> PASO 8/8 COMPLETADO");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[Syntro] Error en Paso 8 (Corredor Enhancer): " + e.Message + "\n" + e.StackTrace);
+        }
+
         AssetDatabase.SaveAssets();
+        var escenaActual = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(escenaActual);
+        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(escenaActual);
         AssetDatabase.Refresh();
 
         Debug.Log("========================================================");
-        Debug.Log("[Syntro] EJECUCION COMPLETA: Todo configurado.");
-        Debug.Log("  - 9 texturas PBR (Color+Normal+Roughness) generadas");
-        Debug.Log("  - 3 materiales de escena (Piso, Pared, Rack) con PBR");
-        Debug.Log("  - 1 material marco madera/vidrio");
-        Debug.Log("  - Materiales asignados a Piso1, Gradas y Piso3");
-        Debug.Log("  - 3 Reflection Probes configurados");
-        Debug.Log("  - Niebla exponencial oscura activada");
-        Debug.Log("  - Global Volume: Bloom, Vignette, ACES, Film Grain");
-        Debug.Log("  - Post-processing activado en Main Camera");
-        Debug.Log("  - 6 fotos procedurales de Syntro generadas");
-        Debug.Log("  - 6 materiales de cuadro con shader mezcla foto/portal");
-        Debug.Log("  - 6 portales configurados con mezcla por proximidad");
-        Debug.Log("  - Sala de Servidores rediseñada con +40 elementos");
-        Debug.Log("  - Edificio Syntro completo: pasillos, 28+ puertas decorativas, fachada");
-        Debug.Log("  - Laboratorio Piso 3: terror, colisiones, 11 estaciones, vigilancia");
+        Debug.Log("[Syntro] EJECUCION COMPLETA: Todo configurado y guardado en la escena.");
         Debug.Log("========================================================");
-        Debug.Log("[Syntro] >>> Guarda la escena (Ctrl+S) para conservar los cambios.");
     }
 }
 #endif

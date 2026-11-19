@@ -147,7 +147,6 @@ public class SalaServidoresTerror : EditorWindow
         var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.name = n; go.transform.SetParent(p); go.transform.localPosition = pos; go.transform.localScale = s;
         go.GetComponent<Renderer>().sharedMaterial = m;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, n); return go;
     }
 
@@ -156,7 +155,6 @@ public class SalaServidoresTerror : EditorWindow
         var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         go.name = n; go.transform.SetParent(p); go.transform.localPosition = pos; go.transform.localScale = s;
         go.GetComponent<Renderer>().sharedMaterial = m;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, n); return go;
     }
 
@@ -165,7 +163,6 @@ public class SalaServidoresTerror : EditorWindow
         var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         go.name = n; go.transform.SetParent(p); go.transform.localPosition = pos; go.transform.localScale = s;
         go.GetComponent<Renderer>().sharedMaterial = m;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
         Undo.RegisterCreatedObjectUndo(go, n); return go;
     }
 

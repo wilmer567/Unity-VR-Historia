@@ -20,7 +20,14 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Unity Essentials/Scenes/SimulacionISTR.unity
     guid: 9ff164600814115bd877332978e47e6e
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/IntroCinematica.unity
+    guid: a8dc5cd89225be2508e98788b0bb2356
+  - enabled: 1
+    path: Assets/_Unity Essentials/Scenes/SimulacionSyntro.unity
+    guid: f40902b4a2f507c6ca27e215fa6d0bbf
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 4419d82f33d36e848b3ed5af4c8da37e, type: 3}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 216971247052083d88bbc518df08c889, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: bd6936fa92496ee5abb3716802d5ba7b, type: 2}

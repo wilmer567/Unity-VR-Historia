@@ -95,7 +95,8 @@ public class TrampaGradasSyntro : MonoBehaviour
         if (siluetaFantasma != null) siluetaFantasma.SetActive(false);
 
         GuardarIntensidadesLuces();
-        DesactivarTriggers();
+        bucleActivo = true;
+        ActivarTriggers();
     }
 
     // ===========================================
@@ -104,17 +105,14 @@ public class TrampaGradasSyntro : MonoBehaviour
 
     public void IniciarBucleGradas()
     {
-        if (bucleActivo || bucleCompletado) return;
-
         bucleActivo = true;
-        vueltaActual = 0;
         ActivarTriggers();
         OnBucleIniciado?.Invoke();
 
         if (textoCartelPiso != null)
             textoCartelPiso.text = "PISO 1";
 
-        Debug.Log("[TrampaGradas] Bucle de gradas iniciado. El jugador debe subir 3 veces.");
+        Debug.Log("[TrampaGradas] Gradas abiertas para tránsito libre.");
     }
 
     // ===========================================
@@ -139,36 +137,14 @@ public class TrampaGradasSyntro : MonoBehaviour
     IEnumerator ProcesarLlegadaDescansoSuperior()
     {
         enTransicion = true;
-        vueltaActual++;
-
-        ConfigVueltaGradas config = GetConfigVuelta(vueltaActual);
-        Debug.Log($"[TrampaGradas] Vuelta {vueltaActual}/3 — Cartel: {config.textoPisoCartel}");
-
-        if (ControladorSentidosVR.Instance != null)
-            ControladorSentidosVR.Instance.ForzarAlerta(config.intensidadTerror);
-
-        if (config.parpadeoLuz)
-            yield return StartCoroutine(SecuenciaParpadeoLuces(config.duracionParpadeo));
+        
+        Debug.Log("[TrampaGradas] Jugador llegó arriba de las gradas. Acceso libre al Piso 3.");
 
         if (textoCartelPiso != null)
-            textoCartelPiso.text = config.textoPisoCartel;
-
-        if (config.activarSilueta)
-            yield return StartCoroutine(MostrarSiluetaFugaz());
+            textoCartelPiso.text = "PISO 3";
 
         OnVueltaCompletada?.Invoke();
-
-        if (vueltaActual >= 3)
-        {
-            yield return StartCoroutine(CompletarBucle());
-        }
-        else
-        {
-            yield return StartCoroutine(TeletransporteSuave(puntoRetornoInferior));
-
-            if (audioGradas != null && sonidoSusurroCercano != null)
-                audioGradas.PlayOneShot(sonidoSusurroCercano, 0.5f);
-        }
+        yield return StartCoroutine(CompletarBucle());
 
         enTransicion = false;
     }
@@ -299,6 +275,13 @@ public class TrampaGradasSyntro : MonoBehaviour
     // ===========================================
     //  COMPLETAR BUCLE → PISO 3
     // ===========================================
+
+    public void ForzarCompletarBucle()
+    {
+        if (bucleCompletado) return;
+        StopAllCoroutines();
+        StartCoroutine(CompletarBucle());
+    }
 
     IEnumerator CompletarBucle()
     {
